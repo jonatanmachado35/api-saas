@@ -1,0 +1,127 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeleteAgentUseCase = exports.ListAgentsUseCase = exports.UpdateAgentUseCase = exports.CreateAgentUseCase = void 0;
+const common_1 = require("@nestjs/common");
+const agent_entity_1 = require("../../domain/entities/agent.entity");
+let CreateAgentUseCase = class CreateAgentUseCase {
+    agentRepository;
+    constructor(agentRepository) {
+        this.agentRepository = agentRepository;
+    }
+    async execute(input) {
+        const agent = new agent_entity_1.Agent({
+            userId: input.user_id,
+            name: input.name,
+            avatar: input.avatar,
+            description: input.description,
+        });
+        await this.agentRepository.save(agent);
+        return {
+            id: agent.id,
+            user_id: agent.userId,
+            name: agent.name,
+            avatar: agent.avatar,
+            description: agent.description,
+            created_at: agent.props.createdAt || new Date(),
+        };
+    }
+};
+exports.CreateAgentUseCase = CreateAgentUseCase;
+exports.CreateAgentUseCase = CreateAgentUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)('AgentRepository')),
+    __metadata("design:paramtypes", [Object])
+], CreateAgentUseCase);
+let UpdateAgentUseCase = class UpdateAgentUseCase {
+    agentRepository;
+    constructor(agentRepository) {
+        this.agentRepository = agentRepository;
+    }
+    async execute(agentId, input) {
+        const agent = await this.agentRepository.findById(agentId);
+        if (!agent) {
+            throw new common_1.NotFoundException('Agent not found');
+        }
+        const updatedAgent = new agent_entity_1.Agent({
+            ...agent.props,
+            name: input.name ?? agent.name,
+            avatar: input.avatar ?? agent.avatar,
+            description: input.description ?? agent.description,
+        }, agent.id);
+        await this.agentRepository.save(updatedAgent);
+        return {
+            agent: {
+                id: updatedAgent.id,
+                user_id: updatedAgent.userId,
+                name: updatedAgent.name,
+                avatar: updatedAgent.avatar,
+                description: updatedAgent.description,
+                created_at: updatedAgent.props.createdAt,
+                updated_at: new Date(),
+            },
+            success: true,
+        };
+    }
+};
+exports.UpdateAgentUseCase = UpdateAgentUseCase;
+exports.UpdateAgentUseCase = UpdateAgentUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)('AgentRepository')),
+    __metadata("design:paramtypes", [Object])
+], UpdateAgentUseCase);
+let ListAgentsUseCase = class ListAgentsUseCase {
+    agentRepository;
+    constructor(agentRepository) {
+        this.agentRepository = agentRepository;
+    }
+    async execute(userId) {
+        const agents = await this.agentRepository.findByUserId(userId);
+        return agents.map((a) => ({
+            id: a.id,
+            user_id: a.userId,
+            name: a.name,
+            avatar: a.avatar,
+            description: a.description,
+            created_at: a.props.createdAt,
+            updated_at: a.props.updatedAt,
+        }));
+    }
+};
+exports.ListAgentsUseCase = ListAgentsUseCase;
+exports.ListAgentsUseCase = ListAgentsUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)('AgentRepository')),
+    __metadata("design:paramtypes", [Object])
+], ListAgentsUseCase);
+let DeleteAgentUseCase = class DeleteAgentUseCase {
+    agentRepository;
+    constructor(agentRepository) {
+        this.agentRepository = agentRepository;
+    }
+    async execute(id) {
+        const agent = await this.agentRepository.findById(id);
+        if (!agent) {
+            throw new common_1.NotFoundException('Agent not found');
+        }
+        await this.agentRepository.delete(id);
+    }
+};
+exports.DeleteAgentUseCase = DeleteAgentUseCase;
+exports.DeleteAgentUseCase = DeleteAgentUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)('AgentRepository')),
+    __metadata("design:paramtypes", [Object])
+], DeleteAgentUseCase);
+//# sourceMappingURL=agent.use-cases.js.map
