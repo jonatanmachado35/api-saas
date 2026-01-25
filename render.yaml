@@ -28,5 +28,3 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
-    buildCommand: npm ci && npm run build && npx prisma generate
-    startCommand: npx prisma migrate deploy && npm run start:prod
