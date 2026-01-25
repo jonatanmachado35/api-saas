@@ -17,6 +17,7 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
 RUN npm run build
+RUN ls -la dist/
 
 # Production stage
 FROM base AS runner
@@ -30,6 +31,7 @@ COPY --from=builder /usr/src/app/prisma ./prisma
 COPY start.sh ./start.sh
 
 RUN chmod +x start.sh
+RUN echo "Checking dist directory:" && ls -la dist/ || echo "dist directory not found!"
 
 EXPOSE 3000
 
