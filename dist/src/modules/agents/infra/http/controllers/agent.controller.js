@@ -21,6 +21,7 @@ const create_agent_dto_1 = require("../dtos/create-agent.dto");
 const update_agent_dto_1 = require("../dtos/update-agent.dto");
 const prisma_service_1 = require("../../../../prisma/prisma.service");
 const current_user_decorator_1 = require("../../../../../core/decorators/current-user.decorator");
+const empty_string_to_null_pipe_1 = require("../../../../../core/pipes/empty-string-to-null.pipe");
 let AgentController = class AgentController {
     createUseCase;
     updateUseCase;
@@ -75,6 +76,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Criar novo agente' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Agente criado com sucesso' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Sem permissao para criar agente com essa visibilidade' }),
+    (0, common_1.UsePipes)(new empty_string_to_null_pipe_1.EmptyStringToNullPipe()),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -87,6 +89,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Agente atualizado com sucesso' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Agente nao encontrado' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Sem permissao para alterar visibilidade' }),
+    (0, common_1.UsePipes)(new empty_string_to_null_pipe_1.EmptyStringToNullPipe()),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __param(1, (0, common_1.Param)('agent_id')),
     __param(2, (0, common_1.Body)()),

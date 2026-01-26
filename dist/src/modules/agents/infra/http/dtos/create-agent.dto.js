@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 const agent_entity_1 = require("../../../domain/entities/agent.entity");
 class CreateAgentDto {
+    user_id;
     name;
     avatar;
     description;
@@ -27,6 +28,10 @@ class CreateAgentDto {
     visibility;
 }
 exports.CreateAgentDto = CreateAgentDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "user_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Meu Agente', description: 'Nome do agente' }),
     (0, class_validator_1.IsString)(),

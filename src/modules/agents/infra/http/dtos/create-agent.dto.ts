@@ -3,6 +3,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AgentVisibility } from '../../../domain/entities/agent.entity';
 
 export class CreateAgentDto {
+  // Campo ignorado - user_id vem do token JWT
+  @IsOptional()
+  user_id?: string;
+
   @ApiProperty({ example: 'Meu Agente', description: 'Nome do agente' })
   @IsString()
   @MaxLength(100)

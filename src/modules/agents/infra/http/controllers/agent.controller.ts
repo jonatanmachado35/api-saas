@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query, HttpCode, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query, HttpCode, HttpStatus, Req, UsePipes } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import {
   CreateAgentUseCase,
@@ -11,6 +11,7 @@ import { CreateAgentDto } from '../dtos/create-agent.dto';
 import { UpdateAgentDto } from '../dtos/update-agent.dto';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CurrentUser } from '../../../../../core/decorators/current-user.decorator';
+import { EmptyStringToNullPipe } from '../../../../../core/pipes/empty-string-to-null.pipe';
 
 @ApiTags('Agents')
 @Controller('agents')
@@ -43,6 +44,7 @@ export class AgentController {
   @ApiOperation({ summary: 'Criar novo agente' })
   @ApiResponse({ status: 201, description: 'Agente criado com sucesso' })
   @ApiResponse({ status: 403, description: 'Sem permissao para criar agente com essa visibilidade' })
+  @UsePipes(new EmptyStringToNullPipe())
   async create(@CurrentUser() user: any, @Body() body: CreateAgentDto) {
     return this.createUseCase.execute({
       ...body,
@@ -56,6 +58,7 @@ export class AgentController {
   @ApiResponse({ status: 200, description: 'Agente atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Agente nao encontrado' })
   @ApiResponse({ status: 403, description: 'Sem permissao para alterar visibilidade' })
+  @UsePipes(new EmptyStringToNullPipe())
   async update(@CurrentUser() user: any, @Param('agent_id') agentId: string, @Body() body: UpdateAgentDto) {
     return this.updateUseCase.execute(agentId, {
       ...body,
