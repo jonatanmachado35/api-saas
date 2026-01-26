@@ -23,6 +23,7 @@ let PrismaUserRepository = class PrismaUserRepository {
             email: user.email,
             password: user.password,
             googleId: user.google_id,
+            githubId: user.github_id,
             fullName: user.full_name,
             avatarUrl: user.avatar_url,
             role: user.role,
@@ -37,6 +38,7 @@ let PrismaUserRepository = class PrismaUserRepository {
             email: user.email,
             password: user.password,
             google_id: user.googleId,
+            github_id: user.githubId,
             full_name: user.fullName,
             avatar_url: user.avatarUrl,
             role: user.role,
@@ -48,6 +50,7 @@ let PrismaUserRepository = class PrismaUserRepository {
                     email: data.email,
                     password: data.password,
                     google_id: data.google_id,
+                    github_id: data.github_id,
                     full_name: data.full_name,
                     avatar_url: data.avatar_url,
                     role: data.role,
@@ -83,6 +86,12 @@ let PrismaUserRepository = class PrismaUserRepository {
     }
     async findByGoogleId(googleId) {
         const user = await this.prisma.user.findUnique({ where: { google_id: googleId } });
+        if (!user)
+            return null;
+        return this.toDomain(user);
+    }
+    async findByGithubId(githubId) {
+        const user = await this.prisma.user.findUnique({ where: { github_id: githubId } });
         if (!user)
             return null;
         return this.toDomain(user);

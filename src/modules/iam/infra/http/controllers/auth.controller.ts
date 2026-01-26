@@ -3,10 +3,11 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { RegisterUserUseCase } from '../../../application/use-cases/register-user.use-case';
 import { LoginUseCase } from '../../../application/use-cases/login.use-case';
 import { GoogleLoginUseCase } from '../../../application/use-cases/google-login.use-case';
+import { GitHubLoginUseCase } from '../../../application/use-cases/github-login.use-case';
 import { ValidateSessionUseCase } from '../../../application/use-cases/validate-session.use-case';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { RegisterDto } from '../dtos/register.dto';
-import { LoginDto, GoogleLoginDto } from '../dtos/login.dto';
+import { LoginDto, GoogleLoginDto, GitHubLoginDto } from '../dtos/login.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -15,6 +16,7 @@ export class AuthController {
     private readonly registerUseCase: RegisterUserUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly googleLoginUseCase: GoogleLoginUseCase,
+    private readonly githubLoginUseCase: GitHubLoginUseCase,
     private readonly validateSessionUseCase: ValidateSessionUseCase,
   ) {}
 
@@ -52,6 +54,14 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
   async googleLogin(@Body() body: GoogleLoginDto) {
     return this.googleLoginUseCase.execute(body);
+  }
+
+  @Post('github')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login com GitHub' })
+  @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
+  async githubLogin(@Body() body: GitHubLoginDto) {
+    return this.githubLoginUseCase.execute(body);
   }
 
   @Post('logout')

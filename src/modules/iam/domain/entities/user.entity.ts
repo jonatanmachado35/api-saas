@@ -11,6 +11,7 @@ export interface UserProps {
   email: string;
   password?: string | null;
   googleId?: string | null;
+  githubId?: string | null;
   fullName?: string | null;
   avatarUrl?: string | null;
   role: UserRole;
@@ -33,6 +34,10 @@ export class User extends Entity<UserProps> {
 
   get googleId() {
     return this.props.googleId;
+  }
+
+  get githubId() {
+    return this.props.githubId;
   }
 
   get fullName() {

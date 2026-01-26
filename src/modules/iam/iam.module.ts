@@ -6,6 +6,7 @@ import { PrismaUserRepository } from './infra/repositories/prisma-user.repositor
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { GoogleLoginUseCase } from './application/use-cases/google-login.use-case';
+import { GitHubLoginUseCase } from './application/use-cases/github-login.use-case';
 import { AuthController } from './infra/http/controllers/auth.controller';
 import { JwtStrategy } from './infra/security/jwt.strategy';
 import { ValidateSessionUseCase } from './application/use-cases/validate-session.use-case';
@@ -33,6 +34,7 @@ import { RoleController } from './infra/http/controllers/role.controller';
     RegisterUserUseCase,
     LoginUseCase,
     GoogleLoginUseCase,
+    GitHubLoginUseCase,
     ValidateSessionUseCase,
     GetProfileUseCase,
     UpdateProfileUseCase,
@@ -45,6 +47,7 @@ import { RoleController } from './infra/http/controllers/role.controller';
     RegisterUserUseCase,
     LoginUseCase,
     GoogleLoginUseCase,
+    GitHubLoginUseCase,
     ValidateSessionUseCase,
     GetProfileUseCase,
     UpdateProfileUseCase,

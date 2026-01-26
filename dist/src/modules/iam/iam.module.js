@@ -15,6 +15,7 @@ const prisma_user_repository_1 = require("./infra/repositories/prisma-user.repos
 const register_user_use_case_1 = require("./application/use-cases/register-user.use-case");
 const login_use_case_1 = require("./application/use-cases/login.use-case");
 const google_login_use_case_1 = require("./application/use-cases/google-login.use-case");
+const github_login_use_case_1 = require("./application/use-cases/github-login.use-case");
 const auth_controller_1 = require("./infra/http/controllers/auth.controller");
 const jwt_strategy_1 = require("./infra/security/jwt.strategy");
 const validate_session_use_case_1 = require("./application/use-cases/validate-session.use-case");
@@ -45,6 +46,7 @@ exports.IamModule = IamModule = __decorate([
             register_user_use_case_1.RegisterUserUseCase,
             login_use_case_1.LoginUseCase,
             google_login_use_case_1.GoogleLoginUseCase,
+            github_login_use_case_1.GitHubLoginUseCase,
             validate_session_use_case_1.ValidateSessionUseCase,
             profile_use_cases_1.GetProfileUseCase,
             profile_use_cases_1.UpdateProfileUseCase,
@@ -57,6 +59,7 @@ exports.IamModule = IamModule = __decorate([
             register_user_use_case_1.RegisterUserUseCase,
             login_use_case_1.LoginUseCase,
             google_login_use_case_1.GoogleLoginUseCase,
+            github_login_use_case_1.GitHubLoginUseCase,
             validate_session_use_case_1.ValidateSessionUseCase,
             profile_use_cases_1.GetProfileUseCase,
             profile_use_cases_1.UpdateProfileUseCase,

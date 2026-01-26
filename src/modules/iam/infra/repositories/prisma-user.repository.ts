@@ -14,6 +14,7 @@ export class PrismaUserRepository implements UserRepository {
         email: user.email,
         password: user.password,
         googleId: user.google_id,
+        githubId: user.github_id,
         fullName: user.full_name,
         avatarUrl: user.avatar_url,
         role: user.role as UserRole,
@@ -32,6 +33,7 @@ export class PrismaUserRepository implements UserRepository {
       email: user.email,
       password: user.password,
       google_id: user.googleId,
+      github_id: user.githubId,
       full_name: user.fullName,
       avatar_url: user.avatarUrl,
       role: user.role as PrismaRole,
@@ -44,6 +46,7 @@ export class PrismaUserRepository implements UserRepository {
           email: data.email,
           password: data.password,
           google_id: data.google_id,
+          github_id: data.github_id,
           full_name: data.full_name,
           avatar_url: data.avatar_url,
           role: data.role,
@@ -80,6 +83,12 @@ export class PrismaUserRepository implements UserRepository {
 
   async findByGoogleId(googleId: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { google_id: googleId } });
+    if (!user) return null;
+    return this.toDomain(user);
+  }
+
+  async findByGithubId(githubId: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { github_id: githubId } });
     if (!user) return null;
     return this.toDomain(user);
   }

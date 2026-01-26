@@ -22,6 +22,9 @@ class User extends base_classes_1.Entity {
     get googleId() {
         return this.props.googleId;
     }
+    get githubId() {
+        return this.props.githubId;
+    }
     get fullName() {
         return this.props.fullName;
     }

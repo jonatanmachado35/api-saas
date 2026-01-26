@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GoogleLoginDto = exports.LoginDto = void 0;
+exports.GitHubLoginDto = exports.GoogleLoginDto = exports.LoginDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 class LoginDto {
@@ -37,4 +37,13 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], GoogleLoginDto.prototype, "google_token", void 0);
+class GitHubLoginDto {
+    github_token;
+}
+exports.GitHubLoginDto = GitHubLoginDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Token de autenticacao do GitHub' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], GitHubLoginDto.prototype, "github_token", void 0);
 //# sourceMappingURL=login.dto.js.map

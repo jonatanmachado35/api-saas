@@ -5,3 +5,6 @@ export declare class LoginDto {
 export declare class GoogleLoginDto {
     google_token: string;
 }
+export declare class GitHubLoginDto {
+    github_token: string;
+}

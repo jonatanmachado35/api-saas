@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const register_user_use_case_1 = require("../../../application/use-cases/register-user.use-case");
 const login_use_case_1 = require("../../../application/use-cases/login.use-case");
 const google_login_use_case_1 = require("../../../application/use-cases/google-login.use-case");
+const github_login_use_case_1 = require("../../../application/use-cases/github-login.use-case");
 const validate_session_use_case_1 = require("../../../application/use-cases/validate-session.use-case");
 const jwt_auth_guard_1 = require("../../security/jwt-auth.guard");
 const register_dto_1 = require("../dtos/register.dto");
@@ -26,11 +27,13 @@ let AuthController = class AuthController {
     registerUseCase;
     loginUseCase;
     googleLoginUseCase;
+    githubLoginUseCase;
     validateSessionUseCase;
-    constructor(registerUseCase, loginUseCase, googleLoginUseCase, validateSessionUseCase) {
+    constructor(registerUseCase, loginUseCase, googleLoginUseCase, githubLoginUseCase, validateSessionUseCase) {
         this.registerUseCase = registerUseCase;
         this.loginUseCase = loginUseCase;
         this.googleLoginUseCase = googleLoginUseCase;
+        this.githubLoginUseCase = githubLoginUseCase;
         this.validateSessionUseCase = validateSessionUseCase;
     }
     async me(req) {
@@ -44,6 +47,9 @@ let AuthController = class AuthController {
     }
     async googleLogin(body) {
         return this.googleLoginUseCase.execute(body);
+    }
+    async githubLogin(body) {
+        return this.githubLoginUseCase.execute(body);
     }
     async logout() {
         return { success: true };
@@ -95,6 +101,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "googleLogin", null);
 __decorate([
+    (0, common_1.Post)('github'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Login com GitHub' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Login realizado com sucesso' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.GitHubLoginDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "githubLogin", null);
+__decorate([
     (0, common_1.Post)('logout'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
@@ -111,6 +127,7 @@ exports.AuthController = AuthController = __decorate([
     __metadata("design:paramtypes", [register_user_use_case_1.RegisterUserUseCase,
         login_use_case_1.LoginUseCase,
         google_login_use_case_1.GoogleLoginUseCase,
+        github_login_use_case_1.GitHubLoginUseCase,
         validate_session_use_case_1.ValidateSessionUseCase])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

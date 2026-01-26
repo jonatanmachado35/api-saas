@@ -9,6 +9,7 @@ export interface UserProps {
     email: string;
     password?: string | null;
     googleId?: string | null;
+    githubId?: string | null;
     fullName?: string | null;
     avatarUrl?: string | null;
     role: UserRole;
@@ -20,6 +21,7 @@ export declare class User extends Entity<UserProps> {
     get email(): string;
     get password(): string | null | undefined;
     get googleId(): string | null | undefined;
+    get githubId(): string | null | undefined;
     get fullName(): string | null | undefined;
     get avatarUrl(): string | null | undefined;
     get role(): UserRole;

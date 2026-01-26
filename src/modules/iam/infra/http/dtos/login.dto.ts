@@ -17,3 +17,9 @@ export class GoogleLoginDto {
   @IsString()
   google_token: string;
 }
+
+export class GitHubLoginDto {
+  @ApiProperty({ description: 'Token de autenticacao do GitHub' })
+  @IsString()
+  github_token: string;
+}
