@@ -23,6 +23,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       return null;
     }
-    return user;
+    // Retornar dados essenciais para o contexto da requisição
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      fullName: user.fullName,
+      avatarUrl: user.avatarUrl,
+    };
   }
 }

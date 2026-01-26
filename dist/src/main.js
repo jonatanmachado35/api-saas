@@ -9,8 +9,11 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const httpAdapterHost = app.get(core_1.HttpAdapterHost);
     app.setGlobalPrefix('api');
+    const allowedOrigins = process.env.CORS_ORIGIN
+        ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+        : '*';
     app.enableCors({
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: allowedOrigins,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
     });

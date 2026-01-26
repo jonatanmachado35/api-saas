@@ -14,6 +14,14 @@ export class PrismaAgentRepository implements AgentRepository {
         name: agent.name,
         avatar: agent.avatar,
         description: agent.description,
+        prompt: agent.prompt,
+        category: agent.category,
+        type: agent.type,
+        tone: agent.tone,
+        style: agent.style,
+        focus: agent.focus,
+        rules: agent.rules,
+        visibility: agent.visibility,
         createdAt: agent.created_at,
         updatedAt: agent.updated_at,
       },
@@ -28,6 +36,14 @@ export class PrismaAgentRepository implements AgentRepository {
       name: agent.name,
       avatar: agent.avatar,
       description: agent.description,
+      prompt: agent.prompt,
+      category: agent.category,
+      type: agent.type,
+      tone: agent.tone,
+      style: agent.style,
+      focus: agent.focus,
+      rules: agent.rules,
+      visibility: agent.visibility,
     };
 
     await this.prisma.agent.upsert({
@@ -36,6 +52,14 @@ export class PrismaAgentRepository implements AgentRepository {
         name: data.name,
         avatar: data.avatar,
         description: data.description,
+        prompt: data.prompt,
+        category: data.category,
+        type: data.type,
+        tone: data.tone,
+        style: data.style,
+        focus: data.focus,
+        rules: data.rules,
+        visibility: data.visibility,
       },
       create: data,
     });
@@ -52,6 +76,35 @@ export class PrismaAgentRepository implements AgentRepository {
       where: { user_id: userId },
       orderBy: { created_at: 'desc' },
     });
+    return agents.map((a) => this.toDomain(a));
+  }
+
+  async findAccessibleByUser(userId: string, userRole: string, userPlan: string): Promise<Agent[]> {
+    const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(userRole);
+    const isPremium = ['PRO', 'CUSTOM'].includes(userPlan);
+
+    const whereConditions: any[] = [
+      // Agentes privados do proprio usuario
+      { user_id: userId, visibility: 'PRIVATE' },
+    ];
+
+    // Se for admin, adiciona agentes ADMIN_ONLY
+    if (isAdmin) {
+      whereConditions.push({ visibility: 'ADMIN_ONLY' });
+    }
+
+    // Se for premium, adiciona agentes PREMIUM
+    if (isPremium) {
+      whereConditions.push({ visibility: 'PREMIUM' });
+    }
+
+    const agents = await this.prisma.agent.findMany({
+      where: {
+        OR: whereConditions,
+      },
+      orderBy: { created_at: 'desc' },
+    });
+
     return agents.map((a) => this.toDomain(a));
   }
 

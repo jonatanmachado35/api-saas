@@ -1,11 +1,8 @@
-import { IsString, IsOptional, IsUUID, MaxLength } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AgentVisibility } from '../../../domain/entities/agent.entity';
 
 export class CreateAgentDto {
-  @ApiProperty({ example: 'uuid', description: 'ID do usuario dono do agente' })
-  @IsUUID()
-  user_id: string;
-
   @ApiProperty({ example: 'Meu Agente', description: 'Nome do agente' })
   @IsString()
   @MaxLength(100)
@@ -22,4 +19,55 @@ export class CreateAgentDto {
   @IsString()
   @MaxLength(500)
   description?: string;
+
+  @ApiPropertyOptional({ example: 'Voce e um assistente prestativo...', description: 'Prompt do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(5000)
+  prompt?: string;
+
+  @ApiPropertyOptional({ example: 'Atendimento', description: 'Categoria do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  category?: string;
+
+  @ApiPropertyOptional({ example: 'Assistente Virtual', description: 'Tipo do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  type?: string;
+
+  @ApiPropertyOptional({ example: 'Profissional', description: 'Tom de voz do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  tone?: string;
+
+  @ApiPropertyOptional({ example: 'Formal', description: 'Estilo de comunicacao do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  style?: string;
+
+  @ApiPropertyOptional({ example: 'Suporte tecnico', description: 'Foco principal do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  focus?: string;
+
+  @ApiPropertyOptional({ example: 'Sempre seja educado...', description: 'Regras de comportamento do agente' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  rules?: string;
+
+  @ApiPropertyOptional({ 
+    enum: AgentVisibility, 
+    example: AgentVisibility.PRIVATE,
+    description: 'Visibilidade do agente: PRIVATE (apenas criador), PREMIUM (usuarios pagantes), ADMIN_ONLY (apenas admins)'
+  })
+  @IsOptional()
+  @IsEnum(AgentVisibility)
+  visibility?: AgentVisibility;
 }

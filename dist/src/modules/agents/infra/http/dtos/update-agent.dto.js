@@ -12,10 +12,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateAgentDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
+const agent_entity_1 = require("../../../domain/entities/agent.entity");
 class UpdateAgentDto {
     name;
     avatar;
     description;
+    prompt;
+    category;
+    type;
+    tone;
+    style;
+    focus;
+    rules;
+    visibility;
 }
 exports.UpdateAgentDto = UpdateAgentDto;
 __decorate([
@@ -39,4 +48,63 @@ __decorate([
     (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], UpdateAgentDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Voce e um assistente prestativo...', description: 'Prompt do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(5000),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "prompt", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Atendimento', description: 'Categoria do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Assistente Virtual', description: 'Tipo do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Profissional', description: 'Tom de voz do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "tone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Formal', description: 'Estilo de comunicacao do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "style", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Suporte tecnico', description: 'Foco principal do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "focus", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Sempre seja educado...', description: 'Regras de comportamento do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(2000),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "rules", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        enum: agent_entity_1.AgentVisibility,
+        example: agent_entity_1.AgentVisibility.PRIVATE,
+        description: 'Visibilidade do agente: PRIVATE (apenas criador), PREMIUM (usuarios pagantes), ADMIN_ONLY (apenas admins)'
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(agent_entity_1.AgentVisibility),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "visibility", void 0);
 //# sourceMappingURL=update-agent.dto.js.map

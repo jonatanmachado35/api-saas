@@ -1,10 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Agent = void 0;
+exports.Agent = exports.AgentVisibility = void 0;
 const base_classes_1 = require("../../../../core/base-classes");
+var AgentVisibility;
+(function (AgentVisibility) {
+    AgentVisibility["PRIVATE"] = "PRIVATE";
+    AgentVisibility["PREMIUM"] = "PREMIUM";
+    AgentVisibility["ADMIN_ONLY"] = "ADMIN_ONLY";
+})(AgentVisibility || (exports.AgentVisibility = AgentVisibility = {}));
 class Agent extends base_classes_1.Entity {
     constructor(props, id) {
         super(props, id);
+        if (!props.visibility) {
+            this.props.visibility = AgentVisibility.PRIVATE;
+        }
     }
     get userId() {
         return this.props.userId;
@@ -17,6 +26,30 @@ class Agent extends base_classes_1.Entity {
     }
     get description() {
         return this.props.description;
+    }
+    get prompt() {
+        return this.props.prompt;
+    }
+    get category() {
+        return this.props.category;
+    }
+    get type() {
+        return this.props.type;
+    }
+    get tone() {
+        return this.props.tone;
+    }
+    get style() {
+        return this.props.style;
+    }
+    get focus() {
+        return this.props.focus;
+    }
+    get rules() {
+        return this.props.rules;
+    }
+    get visibility() {
+        return this.props.visibility;
     }
 }
 exports.Agent = Agent;

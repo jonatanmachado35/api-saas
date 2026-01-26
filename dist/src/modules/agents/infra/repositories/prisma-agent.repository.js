@@ -24,6 +24,14 @@ let PrismaAgentRepository = class PrismaAgentRepository {
             name: agent.name,
             avatar: agent.avatar,
             description: agent.description,
+            prompt: agent.prompt,
+            category: agent.category,
+            type: agent.type,
+            tone: agent.tone,
+            style: agent.style,
+            focus: agent.focus,
+            rules: agent.rules,
+            visibility: agent.visibility,
             createdAt: agent.created_at,
             updatedAt: agent.updated_at,
         }, agent.id);
@@ -35,6 +43,14 @@ let PrismaAgentRepository = class PrismaAgentRepository {
             name: agent.name,
             avatar: agent.avatar,
             description: agent.description,
+            prompt: agent.prompt,
+            category: agent.category,
+            type: agent.type,
+            tone: agent.tone,
+            style: agent.style,
+            focus: agent.focus,
+            rules: agent.rules,
+            visibility: agent.visibility,
         };
         await this.prisma.agent.upsert({
             where: { id: agent.id },
@@ -42,6 +58,14 @@ let PrismaAgentRepository = class PrismaAgentRepository {
                 name: data.name,
                 avatar: data.avatar,
                 description: data.description,
+                prompt: data.prompt,
+                category: data.category,
+                type: data.type,
+                tone: data.tone,
+                style: data.style,
+                focus: data.focus,
+                rules: data.rules,
+                visibility: data.visibility,
             },
             create: data,
         });
@@ -55,6 +79,26 @@ let PrismaAgentRepository = class PrismaAgentRepository {
     async findByUserId(userId) {
         const agents = await this.prisma.agent.findMany({
             where: { user_id: userId },
+            orderBy: { created_at: 'desc' },
+        });
+        return agents.map((a) => this.toDomain(a));
+    }
+    async findAccessibleByUser(userId, userRole, userPlan) {
+        const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(userRole);
+        const isPremium = ['PRO', 'CUSTOM'].includes(userPlan);
+        const whereConditions = [
+            { user_id: userId, visibility: 'PRIVATE' },
+        ];
+        if (isAdmin) {
+            whereConditions.push({ visibility: 'ADMIN_ONLY' });
+        }
+        if (isPremium) {
+            whereConditions.push({ visibility: 'PREMIUM' });
+        }
+        const agents = await this.prisma.agent.findMany({
+            where: {
+                OR: whereConditions,
+            },
             orderBy: { created_at: 'desc' },
         });
         return agents.map((a) => this.toDomain(a));

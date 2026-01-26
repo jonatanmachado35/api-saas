@@ -7,6 +7,12 @@ declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").Strat
 export declare class JwtStrategy extends JwtStrategy_base {
     private readonly userRepository;
     constructor(config: ConfigService, userRepository: UserRepository);
-    validate(payload: any): Promise<import("../../domain/entities/user.entity").User | null>;
+    validate(payload: any): Promise<{
+        id: string;
+        email: string;
+        role: import("../../domain/entities/user.entity").UserRole;
+        fullName: string | null | undefined;
+        avatarUrl: string | null | undefined;
+    } | null>;
 }
 export {};

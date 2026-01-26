@@ -12,18 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateAgentDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
+const agent_entity_1 = require("../../../domain/entities/agent.entity");
 class CreateAgentDto {
-    user_id;
     name;
     avatar;
     description;
+    prompt;
+    category;
+    type;
+    tone;
+    style;
+    focus;
+    rules;
+    visibility;
 }
 exports.CreateAgentDto = CreateAgentDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'uuid', description: 'ID do usuario dono do agente' }),
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateAgentDto.prototype, "user_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Meu Agente', description: 'Nome do agente' }),
     (0, class_validator_1.IsString)(),
@@ -44,4 +47,63 @@ __decorate([
     (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Voce e um assistente prestativo...', description: 'Prompt do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(5000),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "prompt", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Atendimento', description: 'Categoria do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Assistente Virtual', description: 'Tipo do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Profissional', description: 'Tom de voz do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "tone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Formal', description: 'Estilo de comunicacao do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "style", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Suporte tecnico', description: 'Foco principal do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "focus", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Sempre seja educado...', description: 'Regras de comportamento do agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(2000),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "rules", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        enum: agent_entity_1.AgentVisibility,
+        example: agent_entity_1.AgentVisibility.PRIVATE,
+        description: 'Visibilidade do agente: PRIVATE (apenas criador), PREMIUM (usuarios pagantes), ADMIN_ONLY (apenas admins)'
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(agent_entity_1.AgentVisibility),
+    __metadata("design:type", String)
+], CreateAgentDto.prototype, "visibility", void 0);
 //# sourceMappingURL=create-agent.dto.js.map

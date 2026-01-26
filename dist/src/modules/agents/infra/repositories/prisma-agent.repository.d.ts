@@ -8,5 +8,6 @@ export declare class PrismaAgentRepository implements AgentRepository {
     save(agent: Agent): Promise<void>;
     findById(id: string): Promise<Agent | null>;
     findByUserId(userId: string): Promise<Agent[]>;
+    findAccessibleByUser(userId: string, userRole: string, userPlan: string): Promise<Agent[]>;
     delete(id: string): Promise<void>;
 }

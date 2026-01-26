@@ -21,11 +21,24 @@ let CreateAgentUseCase = class CreateAgentUseCase {
         this.agentRepository = agentRepository;
     }
     async execute(input) {
+        const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(input.user_role || '');
+        if (input.visibility && input.visibility !== agent_entity_1.AgentVisibility.PRIVATE && !isAdmin) {
+            throw new common_1.ForbiddenException('Apenas administradores podem criar agentes com visibilidade PREMIUM ou ADMIN_ONLY');
+        }
+        const visibility = isAdmin ? (input.visibility || agent_entity_1.AgentVisibility.PRIVATE) : agent_entity_1.AgentVisibility.PRIVATE;
         const agent = new agent_entity_1.Agent({
             userId: input.user_id,
             name: input.name,
             avatar: input.avatar,
             description: input.description,
+            prompt: input.prompt,
+            category: input.category,
+            type: input.type,
+            tone: input.tone,
+            style: input.style,
+            focus: input.focus,
+            rules: input.rules,
+            visibility,
         });
         await this.agentRepository.save(agent);
         return {
@@ -34,6 +47,14 @@ let CreateAgentUseCase = class CreateAgentUseCase {
             name: agent.name,
             avatar: agent.avatar,
             description: agent.description,
+            prompt: agent.prompt,
+            category: agent.category,
+            type: agent.type,
+            tone: agent.tone,
+            style: agent.style,
+            focus: agent.focus,
+            rules: agent.rules,
+            visibility: agent.visibility,
             created_at: agent.props.createdAt || new Date(),
         };
     }
@@ -54,11 +75,23 @@ let UpdateAgentUseCase = class UpdateAgentUseCase {
         if (!agent) {
             throw new common_1.NotFoundException('Agent not found');
         }
+        const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(input.user_role || '');
+        if (input.visibility && input.visibility !== agent_entity_1.AgentVisibility.PRIVATE && !isAdmin) {
+            throw new common_1.ForbiddenException('Apenas administradores podem alterar a visibilidade para PREMIUM ou ADMIN_ONLY');
+        }
         const updatedAgent = new agent_entity_1.Agent({
             ...agent.props,
             name: input.name ?? agent.name,
             avatar: input.avatar ?? agent.avatar,
             description: input.description ?? agent.description,
+            prompt: input.prompt ?? agent.prompt,
+            category: input.category ?? agent.category,
+            type: input.type ?? agent.type,
+            tone: input.tone ?? agent.tone,
+            style: input.style ?? agent.style,
+            focus: input.focus ?? agent.focus,
+            rules: input.rules ?? agent.rules,
+            visibility: input.visibility ?? agent.visibility,
         }, agent.id);
         await this.agentRepository.save(updatedAgent);
         return {
@@ -68,6 +101,14 @@ let UpdateAgentUseCase = class UpdateAgentUseCase {
                 name: updatedAgent.name,
                 avatar: updatedAgent.avatar,
                 description: updatedAgent.description,
+                prompt: updatedAgent.prompt,
+                category: updatedAgent.category,
+                type: updatedAgent.type,
+                tone: updatedAgent.tone,
+                style: updatedAgent.style,
+                focus: updatedAgent.focus,
+                rules: updatedAgent.rules,
+                visibility: updatedAgent.visibility,
                 created_at: updatedAgent.props.createdAt,
                 updated_at: new Date(),
             },
@@ -86,14 +127,22 @@ let ListAgentsUseCase = class ListAgentsUseCase {
     constructor(agentRepository) {
         this.agentRepository = agentRepository;
     }
-    async execute(userId) {
-        const agents = await this.agentRepository.findByUserId(userId);
+    async execute(userId, userRole, userPlan) {
+        const agents = await this.agentRepository.findAccessibleByUser(userId, userRole, userPlan);
         return agents.map((a) => ({
             id: a.id,
             user_id: a.userId,
             name: a.name,
             avatar: a.avatar,
             description: a.description,
+            prompt: a.prompt,
+            category: a.category,
+            type: a.type,
+            tone: a.tone,
+            style: a.style,
+            focus: a.focus,
+            rules: a.rules,
+            visibility: a.visibility,
             created_at: a.props.createdAt,
             updated_at: a.props.updatedAt,
         }));
