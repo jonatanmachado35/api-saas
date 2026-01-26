@@ -1,10 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { PrismaChatRepository } from '../../infra/repositories/prisma-chat.repository';
 import { Message, MessageSender } from '../../domain/entities/chat.entity';
+import { AgentRepository } from '../../../agents/domain/repositories/agent.repository.interface';
+import { AiChatService } from '../../infra/external-api/ai-chat.service';
 
 @Injectable()
 export class SendMessageUseCase {
-  constructor(private readonly chatRepository: PrismaChatRepository) {}
+  constructor(
+    private readonly chatRepository: PrismaChatRepository,
+    @Inject('AgentRepository')
+    private readonly agentRepository: AgentRepository,
+    private readonly aiChatService: AiChatService,
+  ) {}
 
   async execute(chatId: string, content: string, sender: MessageSender) {
     const chat = await this.chatRepository.findById(chatId);
@@ -20,11 +27,36 @@ export class SendMessageUseCase {
 
     await this.chatRepository.saveMessage(message);
 
-    // If sender is USER, simulate agent response
+    // If sender is USER, get agent config and call AI API
     if (sender === MessageSender.USER) {
+      // Buscar dados do agent associado ao chat
+      const agent = await this.agentRepository.findById(chat.agentId);
+      if (!agent) {
+        throw new NotFoundException('Agent not found');
+      }
+
+      // Preparar regras como array
+      const rules = agent.rules ? agent.rules.split('\n').filter(r => r.trim()) : [];
+
+      // Chamar API externa
+      const aiResponse = await this.aiChatService.sendMessage({
+        message: content,
+        agent: {
+          type: agent.type || 'general',
+          persona: {
+            tone: agent.tone || 'professional',
+            style: agent.style || 'formal',
+            focus: agent.focus || 'general',
+          },
+          rules,
+        },
+      });
+
+      // Salvar resposta do agent
+      const agentMessage = aiResponse.response || aiResponse.message || 'Desculpe, não consegui processar sua mensagem.';
       const agentResponse = new Message({
         chatId,
-        content: 'Obrigado pela sua mensagem! Como posso ajudar?',
+        content: agentMessage,
         sender: MessageSender.AGENT,
       });
       await this.chatRepository.saveMessage(agentResponse);

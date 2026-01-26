@@ -78,9 +78,9 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
-    (0, swagger_1.ApiOperation)({ summary: 'Criar novo agente' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Criar novo agente (requer plano PRO ou superior)' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Agente criado com sucesso' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Sem permissao para criar agente com essa visibilidade' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Plano FREE nao pode criar agentes. Faca upgrade para PRO ou CUSTOM.' }),
     (0, common_1.UsePipes)(new empty_string_to_null_pipe_1.EmptyStringToNullPipe()),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __param(1, (0, common_1.Body)()),

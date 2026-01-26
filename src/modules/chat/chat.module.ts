@@ -3,14 +3,17 @@ import { PrismaChatRepository } from './infra/repositories/prisma-chat.repositor
 import { ChatController } from './infra/http/controllers/chat.controller';
 import { ListChatsUseCase, SendMessageUseCase } from './application/use-cases/chat.use-cases';
 import { IamModule } from '../iam/iam.module';
+import { AiChatService } from './infra/external-api/ai-chat.service';
+import { AgentsModule } from '../agents/agents.module';
 
 @Module({
-  imports: [IamModule],
+  imports: [IamModule, AgentsModule],
   controllers: [ChatController],
   providers: [
     PrismaChatRepository,
     ListChatsUseCase,
     SendMessageUseCase,
+    AiChatService,
   ],
   exports: [PrismaChatRepository],
 })

@@ -41,9 +41,9 @@ export class AgentController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Criar novo agente' })
+  @ApiOperation({ summary: 'Criar novo agente (requer plano PRO ou superior)' })
   @ApiResponse({ status: 201, description: 'Agente criado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Sem permissao para criar agente com essa visibilidade' })
+  @ApiResponse({ status: 403, description: 'Plano FREE nao pode criar agentes. Faca upgrade para PRO ou CUSTOM.' })
   @UsePipes(new EmptyStringToNullPipe())
   async create(@CurrentUser() user: any, @Body() body: CreateAgentDto) {
     // Buscar subscription do usuario

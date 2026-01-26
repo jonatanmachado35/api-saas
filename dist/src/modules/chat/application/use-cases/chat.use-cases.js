@@ -8,15 +8,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListChatsUseCase = exports.SendMessageUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_chat_repository_1 = require("../../infra/repositories/prisma-chat.repository");
 const chat_entity_1 = require("../../domain/entities/chat.entity");
+const ai_chat_service_1 = require("../../infra/external-api/ai-chat.service");
 let SendMessageUseCase = class SendMessageUseCase {
     chatRepository;
-    constructor(chatRepository) {
+    agentRepository;
+    aiChatService;
+    constructor(chatRepository, agentRepository, aiChatService) {
         this.chatRepository = chatRepository;
+        this.agentRepository = agentRepository;
+        this.aiChatService = aiChatService;
     }
     async execute(chatId, content, sender) {
         const chat = await this.chatRepository.findById(chatId);
@@ -30,9 +38,27 @@ let SendMessageUseCase = class SendMessageUseCase {
         });
         await this.chatRepository.saveMessage(message);
         if (sender === chat_entity_1.MessageSender.USER) {
+            const agent = await this.agentRepository.findById(chat.agentId);
+            if (!agent) {
+                throw new common_1.NotFoundException('Agent not found');
+            }
+            const rules = agent.rules ? agent.rules.split('\n').filter(r => r.trim()) : [];
+            const aiResponse = await this.aiChatService.sendMessage({
+                message: content,
+                agent: {
+                    type: agent.type || 'general',
+                    persona: {
+                        tone: agent.tone || 'professional',
+                        style: agent.style || 'formal',
+                        focus: agent.focus || 'general',
+                    },
+                    rules,
+                },
+            });
+            const agentMessage = aiResponse.response || aiResponse.message || 'Desculpe, não consegui processar sua mensagem.';
             const agentResponse = new chat_entity_1.Message({
                 chatId,
-                content: 'Obrigado pela sua mensagem! Como posso ajudar?',
+                content: agentMessage,
                 sender: chat_entity_1.MessageSender.AGENT,
             });
             await this.chatRepository.saveMessage(agentResponse);
@@ -62,7 +88,8 @@ let SendMessageUseCase = class SendMessageUseCase {
 exports.SendMessageUseCase = SendMessageUseCase;
 exports.SendMessageUseCase = SendMessageUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository])
+    __param(1, (0, common_1.Inject)('AgentRepository')),
+    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository, Object, ai_chat_service_1.AiChatService])
 ], SendMessageUseCase);
 let ListChatsUseCase = class ListChatsUseCase {
     chatRepository;

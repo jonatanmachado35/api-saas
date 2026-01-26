@@ -12,17 +12,20 @@ const prisma_chat_repository_1 = require("./infra/repositories/prisma-chat.repos
 const chat_controller_1 = require("./infra/http/controllers/chat.controller");
 const chat_use_cases_1 = require("./application/use-cases/chat.use-cases");
 const iam_module_1 = require("../iam/iam.module");
+const ai_chat_service_1 = require("./infra/external-api/ai-chat.service");
+const agents_module_1 = require("../agents/agents.module");
 let ChatModule = class ChatModule {
 };
 exports.ChatModule = ChatModule;
 exports.ChatModule = ChatModule = __decorate([
     (0, common_1.Module)({
-        imports: [iam_module_1.IamModule],
+        imports: [iam_module_1.IamModule, agents_module_1.AgentsModule],
         controllers: [chat_controller_1.ChatController],
         providers: [
             prisma_chat_repository_1.PrismaChatRepository,
             chat_use_cases_1.ListChatsUseCase,
             chat_use_cases_1.SendMessageUseCase,
+            ai_chat_service_1.AiChatService,
         ],
         exports: [prisma_chat_repository_1.PrismaChatRepository],
     })
