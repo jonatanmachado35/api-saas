@@ -56,7 +56,7 @@ __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Voce e um assistente prestativo...', description: 'Prompt do agente' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(5000),
+    (0, class_validator_1.MaxLength)(20000),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "prompt", void 0);
 __decorate([
@@ -77,28 +77,28 @@ __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Profissional', description: 'Tom de voz do agente' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(100),
+    (0, class_validator_1.MaxLength)(1000),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "tone", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Formal', description: 'Estilo de comunicacao do agente' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(100),
+    (0, class_validator_1.MaxLength)(1000),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "style", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Suporte tecnico', description: 'Foco principal do agente' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(200),
+    (0, class_validator_1.MaxLength)(1000),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "focus", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Sempre seja educado...', description: 'Regras de comportamento do agente' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(2000),
+    (0, class_validator_1.MaxLength)(5000),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "rules", void 0);
 __decorate([

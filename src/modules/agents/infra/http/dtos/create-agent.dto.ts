@@ -27,7 +27,7 @@ export class CreateAgentDto {
   @ApiPropertyOptional({ example: 'Voce e um assistente prestativo...', description: 'Prompt do agente' })
   @IsOptional()
   @IsString()
-  @MaxLength(5000)
+  @MaxLength(20000)
   prompt?: string;
 
   @ApiPropertyOptional({ example: 'Atendimento', description: 'Categoria do agente' })
@@ -45,25 +45,25 @@ export class CreateAgentDto {
   @ApiPropertyOptional({ example: 'Profissional', description: 'Tom de voz do agente' })
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(1000)
   tone?: string;
 
   @ApiPropertyOptional({ example: 'Formal', description: 'Estilo de comunicacao do agente' })
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(1000)
   style?: string;
 
   @ApiPropertyOptional({ example: 'Suporte tecnico', description: 'Foco principal do agente' })
   @IsOptional()
   @IsString()
-  @MaxLength(200)
+  @MaxLength(1000)
   focus?: string;
 
   @ApiPropertyOptional({ example: 'Sempre seja educado...', description: 'Regras de comportamento do agente' })
   @IsOptional()
   @IsString()
-  @MaxLength(2000)
+  @MaxLength(5000)
   rules?: string;
 
   @ApiPropertyOptional({ 
