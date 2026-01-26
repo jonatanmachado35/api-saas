@@ -17,14 +17,17 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const user_entity_1 = require("../../domain/entities/user.entity");
 const bcrypt_hasher_1 = require("../../infra/hashing/bcrypt.hasher");
+const prisma_service_1 = require("../../../prisma/prisma.service");
 let RegisterUserUseCase = class RegisterUserUseCase {
     userRepository;
     hasher;
     jwtService;
-    constructor(userRepository, hasher, jwtService) {
+    prisma;
+    constructor(userRepository, hasher, jwtService, prisma) {
         this.userRepository = userRepository;
         this.hasher = hasher;
         this.jwtService = jwtService;
+        this.prisma = prisma;
     }
     async execute(input) {
         if (!input.password || input.password.length < 6) {
@@ -42,12 +45,27 @@ let RegisterUserUseCase = class RegisterUserUseCase {
             role: user_entity_1.UserRole.USER,
         });
         await this.userRepository.save(user);
+        const subscription = await this.prisma.subscription.findUnique({
+            where: { user_id: user.id },
+        });
         const token = this.jwtService.sign({
             sub: user.id,
             email: user.email,
             role: user.role,
         });
-        return { user, token };
+        return {
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                plan: subscription?.plan || 'FREE',
+                user_metadata: {
+                    full_name: user.fullName,
+                    avatar_url: user.avatarUrl,
+                },
+            },
+            token
+        };
     }
 };
 exports.RegisterUserUseCase = RegisterUserUseCase;
@@ -55,6 +73,7 @@ exports.RegisterUserUseCase = RegisterUserUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('UserRepository')),
     __metadata("design:paramtypes", [Object, bcrypt_hasher_1.BcryptHasher,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        prisma_service_1.PrismaService])
 ], RegisterUserUseCase);
 //# sourceMappingURL=register-user.use-case.js.map

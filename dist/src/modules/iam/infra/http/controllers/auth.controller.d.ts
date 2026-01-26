@@ -14,6 +14,8 @@ export declare class AuthController {
         user: {
             id: string;
             email: string;
+            role: import("../../../domain/entities/user.entity").UserRole;
+            plan: import(".prisma/client").$Enums.Plan;
             user_metadata: {
                 full_name: string | null | undefined;
                 avatar_url: string | null | undefined;
@@ -24,8 +26,11 @@ export declare class AuthController {
         user: {
             id: string;
             email: string;
+            role: import("../../../domain/entities/user.entity").UserRole;
+            plan: import(".prisma/client").$Enums.Plan;
             user_metadata: {
                 full_name: string | null | undefined;
+                avatar_url: string | null | undefined;
             };
         };
         token: string;
@@ -34,6 +39,8 @@ export declare class AuthController {
         user: {
             id: string;
             email: string;
+            role: import("../../../domain/entities/user.entity").UserRole;
+            plan: import(".prisma/client").$Enums.Plan;
             user_metadata: {
                 full_name: string | null | undefined;
                 avatar_url: string | null | undefined;
@@ -45,6 +52,8 @@ export declare class AuthController {
         user: {
             id: string;
             email: string;
+            role: import("../../../domain/entities/user.entity").UserRole;
+            plan: import(".prisma/client").$Enums.Plan;
             user_metadata: {
                 full_name: string | null | undefined;
                 avatar_url: string | null | undefined;

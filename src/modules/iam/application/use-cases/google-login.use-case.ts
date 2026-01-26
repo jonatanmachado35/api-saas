@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../../domain/repositories/user.repository.interface';
 import { User, UserRole } from '../../domain/entities/user.entity';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 export interface GoogleLoginInput {
   google_token: string;
@@ -20,6 +21,7 @@ export class GoogleLoginUseCase {
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(input: GoogleLoginInput) {
@@ -67,10 +69,17 @@ export class GoogleLoginUseCase {
       role: user.role,
     });
 
+    // Buscar subscription do usuario
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { user_id: user.id },
+    });
+
     return {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role,
+        plan: subscription?.plan || 'FREE',
         user_metadata: {
           full_name: user.fullName,
           avatar_url: user.avatarUrl,

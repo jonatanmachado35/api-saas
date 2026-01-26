@@ -16,14 +16,17 @@ exports.LoginUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const bcrypt_hasher_1 = require("../../infra/hashing/bcrypt.hasher");
 const jwt_1 = require("@nestjs/jwt");
+const prisma_service_1 = require("../../../prisma/prisma.service");
 let LoginUseCase = class LoginUseCase {
     userRepository;
     hasher;
     jwtService;
-    constructor(userRepository, hasher, jwtService) {
+    prisma;
+    constructor(userRepository, hasher, jwtService, prisma) {
         this.userRepository = userRepository;
         this.hasher = hasher;
         this.jwtService = jwtService;
+        this.prisma = prisma;
     }
     async execute(input) {
         const user = await this.userRepository.findByEmail(input.email);
@@ -34,6 +37,9 @@ let LoginUseCase = class LoginUseCase {
         if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
+        const subscription = await this.prisma.subscription.findUnique({
+            where: { user_id: user.id },
+        });
         const token = this.jwtService.sign({
             sub: user.id,
             email: user.email,
@@ -43,6 +49,8 @@ let LoginUseCase = class LoginUseCase {
             user: {
                 id: user.id,
                 email: user.email,
+                role: user.role,
+                plan: subscription?.plan || 'FREE',
                 user_metadata: {
                     full_name: user.fullName,
                     avatar_url: user.avatarUrl,
@@ -57,6 +65,7 @@ exports.LoginUseCase = LoginUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('UserRepository')),
     __metadata("design:paramtypes", [Object, bcrypt_hasher_1.BcryptHasher,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        prisma_service_1.PrismaService])
 ], LoginUseCase);
 //# sourceMappingURL=login.use-case.js.map

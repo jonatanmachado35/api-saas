@@ -37,17 +37,7 @@ let AuthController = class AuthController {
         return this.validateSessionUseCase.execute(req.user.id);
     }
     async register(body) {
-        const { user, token } = await this.registerUseCase.execute(body);
-        return {
-            user: {
-                id: user.id,
-                email: user.email,
-                user_metadata: {
-                    full_name: user.fullName,
-                },
-            },
-            token,
-        };
+        return this.registerUseCase.execute(body);
     }
     async login(body) {
         return this.loginUseCase.execute(body);

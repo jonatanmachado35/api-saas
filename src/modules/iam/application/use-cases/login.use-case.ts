@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { UserRepository } from '../../domain/repositories/user.repository.interface';
 import { BcryptHasher } from '../../infra/hashing/bcrypt.hasher';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 export interface LoginInput {
   email: string;
@@ -15,6 +16,7 @@ export class LoginUseCase {
     private readonly userRepository: UserRepository,
     private readonly hasher: BcryptHasher,
     private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(input: LoginInput) {
@@ -28,6 +30,11 @@ export class LoginUseCase {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Buscar subscription do usuario
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { user_id: user.id },
+    });
+
     const token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
@@ -38,6 +45,8 @@ export class LoginUseCase {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role,
+        plan: subscription?.plan || 'FREE',
         user_metadata: {
           full_name: user.fullName,
           avatar_url: user.avatarUrl,

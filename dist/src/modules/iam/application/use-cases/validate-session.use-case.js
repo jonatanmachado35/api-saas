@@ -14,20 +14,28 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidateSessionUseCase = void 0;
 const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../../../prisma/prisma.service");
 let ValidateSessionUseCase = class ValidateSessionUseCase {
     userRepository;
-    constructor(userRepository) {
+    prisma;
+    constructor(userRepository, prisma) {
         this.userRepository = userRepository;
+        this.prisma = prisma;
     }
     async execute(userId) {
         const user = await this.userRepository.findById(userId);
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }
+        const subscription = await this.prisma.subscription.findUnique({
+            where: { user_id: user.id },
+        });
         return {
             user: {
                 id: user.id,
                 email: user.email,
+                role: user.role,
+                plan: subscription?.plan || 'FREE',
                 user_metadata: {
                     full_name: user.fullName,
                     avatar_url: user.avatarUrl,
@@ -40,6 +48,6 @@ exports.ValidateSessionUseCase = ValidateSessionUseCase;
 exports.ValidateSessionUseCase = ValidateSessionUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('UserRepository')),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [Object, prisma_service_1.PrismaService])
 ], ValidateSessionUseCase);
 //# sourceMappingURL=validate-session.use-case.js.map

@@ -16,12 +16,15 @@ exports.GoogleLoginUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const user_entity_1 = require("../../domain/entities/user.entity");
+const prisma_service_1 = require("../../../prisma/prisma.service");
 let GoogleLoginUseCase = class GoogleLoginUseCase {
     userRepository;
     jwtService;
-    constructor(userRepository, jwtService) {
+    prisma;
+    constructor(userRepository, jwtService, prisma) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.prisma = prisma;
     }
     async execute(input) {
         const googlePayload = await this.verifyGoogleToken(input.google_token);
@@ -59,10 +62,15 @@ let GoogleLoginUseCase = class GoogleLoginUseCase {
             email: user.email,
             role: user.role,
         });
+        const subscription = await this.prisma.subscription.findUnique({
+            where: { user_id: user.id },
+        });
         return {
             user: {
                 id: user.id,
                 email: user.email,
+                role: user.role,
+                plan: subscription?.plan || 'FREE',
                 user_metadata: {
                     full_name: user.fullName,
                     avatar_url: user.avatarUrl,
@@ -88,6 +96,7 @@ exports.GoogleLoginUseCase = GoogleLoginUseCase;
 exports.GoogleLoginUseCase = GoogleLoginUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('UserRepository')),
-    __metadata("design:paramtypes", [Object, jwt_1.JwtService])
+    __metadata("design:paramtypes", [Object, jwt_1.JwtService,
+        prisma_service_1.PrismaService])
 ], GoogleLoginUseCase);
 //# sourceMappingURL=google-login.use-case.js.map

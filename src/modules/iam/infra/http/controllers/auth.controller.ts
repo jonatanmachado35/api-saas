@@ -34,17 +34,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Usuario criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Email ja cadastrado ou senha muito curta' })
   async register(@Body() body: RegisterDto) {
-    const { user, token } = await this.registerUseCase.execute(body);
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        user_metadata: {
-          full_name: user.fullName,
-        },
-      },
-      token,
-    };
+    return this.registerUseCase.execute(body);
   }
 
   @Post('login')
