@@ -21,6 +21,17 @@ export class PrismaChatRepository {
     });
   }
 
+  async createChat(userId: string, agentId: string, title?: string): Promise<Chat> {
+    const chat = new Chat({
+      userId,
+      agentId,
+      title: title || null,
+    });
+
+    await this.save(chat);
+    return chat;
+  }
+
   async findById(id: string): Promise<Chat | null> {
     const chat = await this.prisma.chat.findUnique({ where: { id } });
     if (!chat) return null;

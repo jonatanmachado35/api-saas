@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SendMessageDto = void 0;
+exports.CreateChatDto = exports.SendMessageDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 class SendMessageDto {
@@ -23,4 +23,21 @@ __decorate([
     (0, class_validator_1.MaxLength)(5000, { message: 'Mensagem muito longa' }),
     __metadata("design:type", String)
 ], SendMessageDto.prototype, "content", void 0);
+class CreateChatDto {
+    agent_id;
+    title;
+}
+exports.CreateChatDto = CreateChatDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'uuid-do-agente', description: 'ID do agente' }),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateChatDto.prototype, "agent_id", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Conversa sobre IA', description: 'Titulo do chat' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], CreateChatDto.prototype, "title", void 0);
 //# sourceMappingURL=chat.dto.js.map

@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ListChatsUseCase = exports.SendMessageUseCase = void 0;
+exports.CreateChatUseCase = exports.ListChatsUseCase = exports.SendMessageUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_chat_repository_1 = require("../../infra/repositories/prisma-chat.repository");
 const chat_entity_1 = require("../../domain/entities/chat.entity");
@@ -106,4 +106,33 @@ exports.ListChatsUseCase = ListChatsUseCase = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository])
 ], ListChatsUseCase);
+let CreateChatUseCase = class CreateChatUseCase {
+    chatRepository;
+    agentRepository;
+    constructor(chatRepository, agentRepository) {
+        this.chatRepository = chatRepository;
+        this.agentRepository = agentRepository;
+    }
+    async execute(userId, agentId, title) {
+        const agent = await this.agentRepository.findById(agentId);
+        if (!agent) {
+            throw new common_1.NotFoundException('Agent not found');
+        }
+        const chat = await this.chatRepository.createChat(userId, agentId, title);
+        return {
+            id: chat.id,
+            user_id: chat.userId,
+            agent_id: chat.agentId,
+            title: chat.title,
+            created_at: chat.props.createdAt,
+            updated_at: chat.props.updatedAt,
+        };
+    }
+};
+exports.CreateChatUseCase = CreateChatUseCase;
+exports.CreateChatUseCase = CreateChatUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __param(1, (0, common_1.Inject)('AgentRepository')),
+    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository, Object])
+], CreateChatUseCase);
 //# sourceMappingURL=chat.use-cases.js.map

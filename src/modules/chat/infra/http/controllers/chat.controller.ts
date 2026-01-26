@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Param, UseGuards, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { ListChatsUseCase, SendMessageUseCase } from '../../../application/use-cases/chat.use-cases';
+import { ListChatsUseCase, SendMessageUseCase, CreateChatUseCase } from '../../../application/use-cases/chat.use-cases';
 import { JwtAuthGuard } from '../../../../iam/infra/security/jwt-auth.guard';
 import { MessageSender } from '../../../domain/entities/chat.entity';
-import { SendMessageDto } from '../dtos/chat.dto';
+import { SendMessageDto, CreateChatDto } from '../dtos/chat.dto';
+import { CurrentUser } from '../../../../../core/decorators/current-user.decorator';
 
 @ApiTags('Chats')
 @Controller('chats')
@@ -13,14 +14,23 @@ export class ChatController {
   constructor(
     private readonly listUseCase: ListChatsUseCase,
     private readonly sendUseCase: SendMessageUseCase,
+    private readonly createUseCase: CreateChatUseCase,
   ) {}
 
   @Get()
   @ApiOperation({ summary: 'Listar chats do usuario' })
-  @ApiQuery({ name: 'user_id', required: true, description: 'ID do usuario' })
   @ApiResponse({ status: 200, description: 'Lista de chats' })
-  async list(@Query('user_id') userId: string) {
-    return this.listUseCase.execute(userId);
+  async list(@CurrentUser() user: any) {
+    return this.listUseCase.execute(user.id);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Criar novo chat com um agente' })
+  @ApiResponse({ status: 201, description: 'Chat criado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Agente nao encontrado' })
+  async create(@CurrentUser() user: any, @Body() body: CreateChatDto) {
+    return this.createUseCase.execute(user.id, body.agent_id, body.title);
   }
 
   @Post(':chat_id/messages')

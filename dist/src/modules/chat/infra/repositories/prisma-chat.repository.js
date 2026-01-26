@@ -31,6 +31,15 @@ let PrismaChatRepository = class PrismaChatRepository {
             create: data,
         });
     }
+    async createChat(userId, agentId, title) {
+        const chat = new chat_entity_1.Chat({
+            userId,
+            agentId,
+            title: title || null,
+        });
+        await this.save(chat);
+        return chat;
+    }
     async findById(id) {
         const chat = await this.prisma.chat.findUnique({ where: { id } });
         if (!chat)

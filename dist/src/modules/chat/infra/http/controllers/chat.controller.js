@@ -19,15 +19,21 @@ const chat_use_cases_1 = require("../../../application/use-cases/chat.use-cases"
 const jwt_auth_guard_1 = require("../../../../iam/infra/security/jwt-auth.guard");
 const chat_entity_1 = require("../../../domain/entities/chat.entity");
 const chat_dto_1 = require("../dtos/chat.dto");
+const current_user_decorator_1 = require("../../../../../core/decorators/current-user.decorator");
 let ChatController = class ChatController {
     listUseCase;
     sendUseCase;
-    constructor(listUseCase, sendUseCase) {
+    createUseCase;
+    constructor(listUseCase, sendUseCase, createUseCase) {
         this.listUseCase = listUseCase;
         this.sendUseCase = sendUseCase;
+        this.createUseCase = createUseCase;
     }
-    async list(userId) {
-        return this.listUseCase.execute(userId);
+    async list(user) {
+        return this.listUseCase.execute(user.id);
+    }
+    async create(user, body) {
+        return this.createUseCase.execute(user.id, body.agent_id, body.title);
     }
     async sendMessage(chatId, body) {
         return this.sendUseCase.execute(chatId, body.content, chat_entity_1.MessageSender.USER);
@@ -37,13 +43,24 @@ exports.ChatController = ChatController;
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Listar chats do usuario' }),
-    (0, swagger_1.ApiQuery)({ name: 'user_id', required: true, description: 'ID do usuario' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de chats' }),
-    __param(0, (0, common_1.Query)('user_id')),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "list", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    (0, swagger_1.ApiOperation)({ summary: 'Criar novo chat com um agente' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Chat criado com sucesso' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Agente nao encontrado' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, chat_dto_1.CreateChatDto]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)(':chat_id/messages'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -62,6 +79,7 @@ exports.ChatController = ChatController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
     __metadata("design:paramtypes", [chat_use_cases_1.ListChatsUseCase,
-        chat_use_cases_1.SendMessageUseCase])
+        chat_use_cases_1.SendMessageUseCase,
+        chat_use_cases_1.CreateChatUseCase])
 ], ChatController);
 //# sourceMappingURL=chat.controller.js.map

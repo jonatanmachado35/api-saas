@@ -95,3 +95,32 @@ export class ListChatsUseCase {
     return chats;
   }
 }
+
+@Injectable()
+export class CreateChatUseCase {
+  constructor(
+    private readonly chatRepository: PrismaChatRepository,
+    @Inject('AgentRepository')
+    private readonly agentRepository: AgentRepository,
+  ) {}
+
+  async execute(userId: string, agentId: string, title?: string) {
+    // Verificar se o agent existe
+    const agent = await this.agentRepository.findById(agentId);
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Criar o chat
+    const chat = await this.chatRepository.createChat(userId, agentId, title);
+
+    return {
+      id: chat.id,
+      user_id: chat.userId,
+      agent_id: chat.agentId,
+      title: chat.title,
+      created_at: chat.props.createdAt,
+      updated_at: chat.props.updatedAt,
+    };
+  }
+}

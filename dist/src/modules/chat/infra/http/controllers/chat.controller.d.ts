@@ -1,10 +1,19 @@
-import { ListChatsUseCase, SendMessageUseCase } from '../../../application/use-cases/chat.use-cases';
-import { SendMessageDto } from '../dtos/chat.dto';
+import { ListChatsUseCase, SendMessageUseCase, CreateChatUseCase } from '../../../application/use-cases/chat.use-cases';
+import { SendMessageDto, CreateChatDto } from '../dtos/chat.dto';
 export declare class ChatController {
     private readonly listUseCase;
     private readonly sendUseCase;
-    constructor(listUseCase: ListChatsUseCase, sendUseCase: SendMessageUseCase);
-    list(userId: string): Promise<any[]>;
+    private readonly createUseCase;
+    constructor(listUseCase: ListChatsUseCase, sendUseCase: SendMessageUseCase, createUseCase: CreateChatUseCase);
+    list(user: any): Promise<any[]>;
+    create(user: any, body: CreateChatDto): Promise<{
+        id: string;
+        user_id: string;
+        agent_id: string;
+        title: string | null | undefined;
+        created_at: Date | undefined;
+        updated_at: Date | undefined;
+    }>;
     sendMessage(chatId: string, body: SendMessageDto): Promise<{
         id: string;
         chat_id: string;
