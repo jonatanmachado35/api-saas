@@ -22,6 +22,10 @@ let CreateAgentUseCase = class CreateAgentUseCase {
     }
     async execute(input) {
         const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(input.user_role || '');
+        const isPremium = ['PRO', 'CUSTOM'].includes(input.user_plan || '');
+        if (!isPremium && !isAdmin) {
+            throw new common_1.ForbiddenException('Apenas usuários com plano PRO ou CUSTOM podem criar agentes');
+        }
         if (input.visibility && input.visibility !== agent_entity_1.AgentVisibility.PRIVATE && !isAdmin) {
             throw new common_1.ForbiddenException('Apenas administradores podem criar agentes com visibilidade PREMIUM ou ADMIN_ONLY');
         }

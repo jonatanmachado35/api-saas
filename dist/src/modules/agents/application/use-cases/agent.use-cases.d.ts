@@ -3,6 +3,7 @@ import { AgentVisibility } from '../../domain/entities/agent.entity';
 export interface CreateAgentInput {
     user_id: string;
     user_role?: string;
+    user_plan?: string;
     name: string;
     avatar?: string;
     description?: string;

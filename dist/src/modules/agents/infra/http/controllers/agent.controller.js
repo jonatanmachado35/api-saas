@@ -43,10 +43,15 @@ let AgentController = class AgentController {
         return this.listUseCase.execute(user.id, user.role, userPlan);
     }
     async create(user, body) {
+        const subscription = await this.prisma.subscription.findUnique({
+            where: { user_id: user.id },
+        });
+        const userPlan = subscription?.plan || 'FREE';
         return this.createUseCase.execute({
             ...body,
             user_id: user.id,
             user_role: user.role,
+            user_plan: userPlan,
         });
     }
     async update(user, agentId, body) {

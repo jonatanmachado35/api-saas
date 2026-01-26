@@ -5,6 +5,7 @@ import { Agent, AgentVisibility } from '../../domain/entities/agent.entity';
 export interface CreateAgentInput {
   user_id: string;
   user_role?: string;
+  user_plan?: string;
   name: string;
   avatar?: string;
   description?: string;
@@ -27,6 +28,12 @@ export class CreateAgentUseCase {
 
   async execute(input: CreateAgentInput) {
     const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(input.user_role || '');
+    const isPremium = ['PRO', 'CUSTOM'].includes(input.user_plan || '');
+    
+    // Validar que apenas usuários pagantes ou admins podem criar agentes
+    if (!isPremium && !isAdmin) {
+      throw new ForbiddenException('Apenas usuários com plano PRO ou CUSTOM podem criar agentes');
+    }
     
     // Validar que apenas admins podem criar agentes PREMIUM ou ADMIN_ONLY
     if (input.visibility && input.visibility !== AgentVisibility.PRIVATE && !isAdmin) {
