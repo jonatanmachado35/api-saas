@@ -27,7 +27,7 @@ let CreateAgentUseCase = class CreateAgentUseCase {
             throw new common_1.ForbiddenException('Apenas usuários com plano PRO ou CUSTOM podem criar agentes');
         }
         if (input.visibility && input.visibility !== agent_entity_1.AgentVisibility.PRIVATE && !isAdmin) {
-            throw new common_1.ForbiddenException('Apenas administradores podem criar agentes com visibilidade PREMIUM ou ADMIN_ONLY');
+            throw new common_1.ForbiddenException('Apenas administradores podem criar agentes públicos ou com visibilidade específica por plano');
         }
         const visibility = isAdmin ? (input.visibility || agent_entity_1.AgentVisibility.PRIVATE) : agent_entity_1.AgentVisibility.PRIVATE;
         const agent = new agent_entity_1.Agent({
@@ -81,7 +81,7 @@ let UpdateAgentUseCase = class UpdateAgentUseCase {
         }
         const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(input.user_role || '');
         if (input.visibility && input.visibility !== agent_entity_1.AgentVisibility.PRIVATE && !isAdmin) {
-            throw new common_1.ForbiddenException('Apenas administradores podem alterar a visibilidade para PREMIUM ou ADMIN_ONLY');
+            throw new common_1.ForbiddenException('Apenas administradores podem alterar a visibilidade para pública ou específica por plano');
         }
         const updatedAgent = new agent_entity_1.Agent({
             ...agent.props,

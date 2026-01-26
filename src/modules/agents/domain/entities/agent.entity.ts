@@ -2,7 +2,9 @@ import { Entity } from '../../../../core/base-classes';
 
 export enum AgentVisibility {
   PRIVATE = 'PRIVATE',
-  PREMIUM = 'PREMIUM',
+  PUBLIC = 'PUBLIC',
+  PRO_ONLY = 'PRO_ONLY',
+  CUSTOM_ONLY = 'CUSTOM_ONLY',
   ADMIN_ONLY = 'ADMIN_ONLY',
 }
 

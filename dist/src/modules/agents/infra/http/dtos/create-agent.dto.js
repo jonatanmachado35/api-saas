@@ -105,7 +105,7 @@ __decorate([
     (0, swagger_1.ApiPropertyOptional)({
         enum: agent_entity_1.AgentVisibility,
         example: agent_entity_1.AgentVisibility.PRIVATE,
-        description: 'Visibilidade do agente: PRIVATE (apenas criador), PREMIUM (usuarios pagantes), ADMIN_ONLY (apenas admins)'
+        description: 'Visibilidade: PRIVATE (apenas criador), PUBLIC (todos usuarios FREE+), PRO_ONLY (PRO e CUSTOM), CUSTOM_ONLY (apenas CUSTOM), ADMIN_ONLY (apenas admins)'
     }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(agent_entity_1.AgentVisibility),

@@ -35,9 +35,9 @@ export class CreateAgentUseCase {
       throw new ForbiddenException('Apenas usuários com plano PRO ou CUSTOM podem criar agentes');
     }
     
-    // Validar que apenas admins podem criar agentes PREMIUM ou ADMIN_ONLY
+    // Validar que apenas admins podem criar agentes com visibilidade diferente de PRIVATE
     if (input.visibility && input.visibility !== AgentVisibility.PRIVATE && !isAdmin) {
-      throw new ForbiddenException('Apenas administradores podem criar agentes com visibilidade PREMIUM ou ADMIN_ONLY');
+      throw new ForbiddenException('Apenas administradores podem criar agentes públicos ou com visibilidade específica por plano');
     }
 
     // Se não for admin, forçar visibilidade PRIVATE
@@ -109,9 +109,9 @@ export class UpdateAgentUseCase {
 
     const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(input.user_role || '');
     
-    // Validar que apenas admins podem alterar visibilidade para PREMIUM ou ADMIN_ONLY
+    // Validar que apenas admins podem alterar visibilidade para algo diferente de PRIVATE
     if (input.visibility && input.visibility !== AgentVisibility.PRIVATE && !isAdmin) {
-      throw new ForbiddenException('Apenas administradores podem alterar a visibilidade para PREMIUM ou ADMIN_ONLY');
+      throw new ForbiddenException('Apenas administradores podem alterar a visibilidade para pública ou específica por plano');
     }
 
     const updatedAgent = new Agent(

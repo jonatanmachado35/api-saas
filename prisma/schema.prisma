@@ -34,7 +34,9 @@ enum Sender {
 
 enum AgentVisibility {
   PRIVATE
-  PREMIUM
+  PUBLIC
+  PRO_ONLY
+  CUSTOM_ONLY
   ADMIN_ONLY
 }
 

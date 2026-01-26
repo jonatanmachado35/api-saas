@@ -85,15 +85,20 @@ let PrismaAgentRepository = class PrismaAgentRepository {
     }
     async findAccessibleByUser(userId, userRole, userPlan) {
         const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(userRole);
-        const isPremium = ['PRO', 'CUSTOM'].includes(userPlan);
+        const isPro = userPlan === 'PRO';
+        const isCustom = userPlan === 'CUSTOM';
         const whereConditions = [
             { user_id: userId, visibility: 'PRIVATE' },
+            { visibility: 'PUBLIC' },
         ];
+        if (isPro || isCustom) {
+            whereConditions.push({ visibility: 'PRO_ONLY' });
+        }
+        if (isCustom) {
+            whereConditions.push({ visibility: 'CUSTOM_ONLY' });
+        }
         if (isAdmin) {
             whereConditions.push({ visibility: 'ADMIN_ONLY' });
-        }
-        if (isPremium) {
-            whereConditions.push({ visibility: 'PREMIUM' });
         }
         const agents = await this.prisma.agent.findMany({
             where: {

@@ -81,21 +81,29 @@ export class PrismaAgentRepository implements AgentRepository {
 
   async findAccessibleByUser(userId: string, userRole: string, userPlan: string): Promise<Agent[]> {
     const isAdmin = ['ADMIN', 'MODERATOR', 'OWNER'].includes(userRole);
-    const isPremium = ['PRO', 'CUSTOM'].includes(userPlan);
+    const isPro = userPlan === 'PRO';
+    const isCustom = userPlan === 'CUSTOM';
 
     const whereConditions: any[] = [
-      // Agentes privados do proprio usuario
+      // Agentes privados do próprio usuário
       { user_id: userId, visibility: 'PRIVATE' },
+      // Agentes públicos (todos podem ver)
+      { visibility: 'PUBLIC' },
     ];
+
+    // Se for PRO, adiciona agentes PRO_ONLY
+    if (isPro || isCustom) {
+      whereConditions.push({ visibility: 'PRO_ONLY' });
+    }
+
+    // Se for CUSTOM, adiciona agentes CUSTOM_ONLY
+    if (isCustom) {
+      whereConditions.push({ visibility: 'CUSTOM_ONLY' });
+    }
 
     // Se for admin, adiciona agentes ADMIN_ONLY
     if (isAdmin) {
       whereConditions.push({ visibility: 'ADMIN_ONLY' });
-    }
-
-    // Se for premium, adiciona agentes PREMIUM
-    if (isPremium) {
-      whereConditions.push({ visibility: 'PREMIUM' });
     }
 
     const agents = await this.prisma.agent.findMany({

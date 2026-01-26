@@ -5,7 +5,9 @@ const base_classes_1 = require("../../../../core/base-classes");
 var AgentVisibility;
 (function (AgentVisibility) {
     AgentVisibility["PRIVATE"] = "PRIVATE";
-    AgentVisibility["PREMIUM"] = "PREMIUM";
+    AgentVisibility["PUBLIC"] = "PUBLIC";
+    AgentVisibility["PRO_ONLY"] = "PRO_ONLY";
+    AgentVisibility["CUSTOM_ONLY"] = "CUSTOM_ONLY";
     AgentVisibility["ADMIN_ONLY"] = "ADMIN_ONLY";
 })(AgentVisibility || (exports.AgentVisibility = AgentVisibility = {}));
 class Agent extends base_classes_1.Entity {

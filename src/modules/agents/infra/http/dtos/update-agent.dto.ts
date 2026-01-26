@@ -66,7 +66,7 @@ export class UpdateAgentDto {
   @ApiPropertyOptional({ 
     enum: AgentVisibility, 
     example: AgentVisibility.PRIVATE,
-    description: 'Visibilidade do agente: PRIVATE (apenas criador), PREMIUM (usuarios pagantes), ADMIN_ONLY (apenas admins)'
+    description: 'Visibilidade: PRIVATE (apenas criador), PUBLIC (todos usuarios FREE+), PRO_ONLY (PRO e CUSTOM), CUSTOM_ONLY (apenas CUSTOM), ADMIN_ONLY (apenas admins)'
   })
   @IsOptional()
   @IsEnum(AgentVisibility)
