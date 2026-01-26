@@ -35,7 +35,13 @@ let AiChatService = class AiChatService {
         }
         catch (error) {
             if (error.response) {
-                throw new common_1.HttpException(`AI API error: ${error.response.data?.message || 'Unknown error'}`, error.response.status);
+                if (error.response.status === 429) {
+                    const detail = error.response.data?.detail;
+                    if (detail && detail.includes('Limite de créditos')) {
+                        throw new common_1.HttpException('Os créditos da API acabaram. Tente novamente mais tarde.', common_1.HttpStatus.TOO_MANY_REQUESTS);
+                    }
+                }
+                throw new common_1.HttpException(`AI API error: ${error.response.data?.message || error.response.data?.detail || 'Unknown error'}`, error.response.status);
             }
             else if (error.request) {
                 throw new common_1.HttpException('AI API não respondeu. Tente novamente mais tarde.', common_1.HttpStatus.SERVICE_UNAVAILABLE);
