@@ -97,6 +97,33 @@ export class ListChatsUseCase {
 }
 
 @Injectable()
+export class ListMessagesUseCase {
+  constructor(private readonly chatRepository: PrismaChatRepository) {}
+
+  async execute(chatId: string, userId: string) {
+    // Verificar se o chat existe e pertence ao usuário
+    const chat = await this.chatRepository.findById(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    if (chat.userId !== userId) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    const messages = await this.chatRepository.findMessagesByChatId(chatId);
+    
+    return messages.map(m => ({
+      id: m.id,
+      chat_id: m.chatId,
+      content: m.content,
+      sender: m.sender.toLowerCase(),
+      timestamp: m.props.timestamp || new Date(),
+    }));
+  }
+}
+
+@Injectable()
 export class CreateChatUseCase {
   constructor(
     private readonly chatRepository: PrismaChatRepository,
@@ -121,6 +148,30 @@ export class CreateChatUseCase {
       title: chat.title,
       created_at: chat.props.createdAt,
       updated_at: chat.props.updatedAt,
+    };
+  }
+}
+
+@Injectable()
+export class ClearChatUseCase {
+  constructor(private readonly chatRepository: PrismaChatRepository) {}
+
+  async execute(chatId: string, userId: string) {
+    // Verificar se o chat existe e pertence ao usuário
+    const chat = await this.chatRepository.findById(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    if (chat.userId !== userId) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    // Deletar todas as mensagens do chat
+    await this.chatRepository.deleteMessagesByChatId(chatId);
+
+    return {
+      message: 'Chat cleared successfully',
     };
   }
 }

@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { ListChatsUseCase, SendMessageUseCase, CreateChatUseCase } from '../../../application/use-cases/chat.use-cases';
+import { ListChatsUseCase, SendMessageUseCase, CreateChatUseCase, ListMessagesUseCase, ClearChatUseCase } from '../../../application/use-cases/chat.use-cases';
 import { JwtAuthGuard } from '../../../../iam/infra/security/jwt-auth.guard';
 import { MessageSender } from '../../../domain/entities/chat.entity';
 import { SendMessageDto, CreateChatDto } from '../dtos/chat.dto';
@@ -15,6 +15,8 @@ export class ChatController {
     private readonly listUseCase: ListChatsUseCase,
     private readonly sendUseCase: SendMessageUseCase,
     private readonly createUseCase: CreateChatUseCase,
+    private readonly listMessagesUseCase: ListMessagesUseCase,
+    private readonly clearChatUseCase: ClearChatUseCase,
   ) {}
 
   @Get()
@@ -33,6 +35,17 @@ export class ChatController {
     return this.createUseCase.execute(user.id, body.agent_id, body.title);
   }
 
+  @Get(':chat_id/messages')
+  @ApiOperation({ summary: 'Listar mensagens de um chat' })
+  @ApiResponse({ status: 200, description: 'Lista de mensagens do chat' })
+  @ApiResponse({ status: 404, description: 'Chat nao encontrado' })
+  async listMessages(
+    @Param('chat_id') chatId: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.listMessagesUseCase.execute(chatId, user.id);
+  }
+
   @Post(':chat_id/messages')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Enviar mensagem no chat' })
@@ -43,5 +56,17 @@ export class ChatController {
     @Body() body: SendMessageDto,
   ) {
     return this.sendUseCase.execute(chatId, body.content, MessageSender.USER);
+  }
+
+  @Delete(':chat_id/messages')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Limpar todas as mensagens de um chat' })
+  @ApiResponse({ status: 200, description: 'Chat limpo com sucesso' })
+  @ApiResponse({ status: 404, description: 'Chat nao encontrado' })
+  async clearChat(
+    @Param('chat_id') chatId: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.clearChatUseCase.execute(chatId, user.id);
   }
 }

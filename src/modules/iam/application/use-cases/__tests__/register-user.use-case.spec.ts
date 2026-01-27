@@ -5,12 +5,14 @@ import { RegisterUserUseCase } from '../register-user.use-case';
 import { BcryptHasher } from '../../../infra/hashing/bcrypt.hasher';
 import { UserRepository } from '../../../domain/repositories/user.repository.interface';
 import { User, UserRole } from '../../../domain/entities/user.entity';
+import { PrismaService } from '../../../../prisma/prisma.service';
 
 describe('RegisterUserUseCase', () => {
   let useCase: RegisterUserUseCase;
   let userRepository: jest.Mocked<UserRepository>;
   let hasher: jest.Mocked<BcryptHasher>;
   let jwtService: jest.Mocked<JwtService>;
+  let prismaService: jest.Mocked<PrismaService>;
 
   beforeEach(async () => {
     const mockUserRepository = {
@@ -18,6 +20,7 @@ describe('RegisterUserUseCase', () => {
       save: jest.fn(),
       findById: jest.fn(),
       findByGoogleId: jest.fn(),
+      findByGithubId: jest.fn(),
       findAll: jest.fn(),
     };
 
@@ -30,12 +33,19 @@ describe('RegisterUserUseCase', () => {
       sign: jest.fn(),
     };
 
+    const mockPrismaService = {
+      subscription: {
+        findUnique: jest.fn(),
+      },
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RegisterUserUseCase,
         { provide: 'UserRepository', useValue: mockUserRepository },
         { provide: BcryptHasher, useValue: mockHasher },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: PrismaService, useValue: mockPrismaService },
       ],
     }).compile();
 
@@ -43,6 +53,7 @@ describe('RegisterUserUseCase', () => {
     userRepository = module.get('UserRepository');
     hasher = module.get(BcryptHasher);
     jwtService = module.get(JwtService);
+    prismaService = module.get(PrismaService);
   });
 
   it('should be defined', () => {
@@ -61,6 +72,9 @@ describe('RegisterUserUseCase', () => {
       hasher.hash.mockResolvedValue('hashed_password');
       jwtService.sign.mockReturnValue('jwt_token');
       userRepository.save.mockResolvedValue();
+      (prismaService.subscription.findUnique as jest.Mock).mockResolvedValue({
+        plan: 'FREE',
+      });
 
       const result = await useCase.execute(validInput);
 
@@ -71,6 +85,7 @@ describe('RegisterUserUseCase', () => {
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('token', 'jwt_token');
       expect(result.user.email).toBe(validInput.email);
+      expect(result.user.plan).toBe('FREE');
     });
 
     it('should throw ConflictException if email already exists', async () => {

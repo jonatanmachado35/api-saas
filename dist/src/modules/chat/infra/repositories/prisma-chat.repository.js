@@ -112,6 +112,11 @@ let PrismaChatRepository = class PrismaChatRepository {
             timestamp: m.timestamp,
         }, m.id));
     }
+    async deleteMessagesByChatId(chatId) {
+        await this.prisma.message.deleteMany({
+            where: { chat_id: chatId },
+        });
+    }
 };
 exports.PrismaChatRepository = PrismaChatRepository;
 exports.PrismaChatRepository = PrismaChatRepository = __decorate([

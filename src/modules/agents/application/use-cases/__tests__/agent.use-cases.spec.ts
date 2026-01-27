@@ -31,6 +31,7 @@ describe('Agent Use Cases', () => {
       save: jest.fn(),
       findById: jest.fn(),
       findByUserId: jest.fn(),
+      findAccessibleByUser: jest.fn(),
       findAll: jest.fn(),
       delete: jest.fn(),
     };
@@ -60,6 +61,8 @@ describe('Agent Use Cases', () => {
     it('should create an agent successfully', async () => {
       const input = {
         user_id: 'user-id-123',
+        user_role: 'USER',
+        user_plan: 'PRO',
         name: 'New Agent',
         avatar: '🧠',
         description: 'New description',
@@ -113,19 +116,19 @@ describe('Agent Use Cases', () => {
     });
 
     it('should list agents for a user', async () => {
-      agentRepository.findByUserId.mockResolvedValue([mockAgent]);
+      agentRepository.findAccessibleByUser.mockResolvedValue([mockAgent]);
 
-      const result = await listUseCase.execute('user-id-123');
+      const result = await listUseCase.execute('user-id-123', 'USER', 'FREE');
 
-      expect(agentRepository.findByUserId).toHaveBeenCalledWith('user-id-123');
+      expect(agentRepository.findAccessibleByUser).toHaveBeenCalledWith('user-id-123', 'USER', 'FREE');
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('id', mockAgent.id);
     });
 
     it('should return empty array if no agents found', async () => {
-      agentRepository.findByUserId.mockResolvedValue([]);
+      agentRepository.findAccessibleByUser.mockResolvedValue([]);
 
-      const result = await listUseCase.execute('user-id-123');
+      const result = await listUseCase.execute('user-id-123', 'USER', 'FREE');
 
       expect(result).toHaveLength(0);
     });

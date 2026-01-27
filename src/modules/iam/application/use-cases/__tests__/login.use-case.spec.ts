@@ -5,12 +5,14 @@ import { LoginUseCase } from '../login.use-case';
 import { BcryptHasher } from '../../../infra/hashing/bcrypt.hasher';
 import { UserRepository } from '../../../domain/repositories/user.repository.interface';
 import { User, UserRole } from '../../../domain/entities/user.entity';
+import { PrismaService } from '../../../../prisma/prisma.service';
 
 describe('LoginUseCase', () => {
   let useCase: LoginUseCase;
   let userRepository: jest.Mocked<UserRepository>;
   let hasher: jest.Mocked<BcryptHasher>;
   let jwtService: jest.Mocked<JwtService>;
+  let prismaService: jest.Mocked<PrismaService>;
 
   const mockUser = new User(
     {
@@ -28,6 +30,7 @@ describe('LoginUseCase', () => {
       save: jest.fn(),
       findById: jest.fn(),
       findByGoogleId: jest.fn(),
+      findByGithubId: jest.fn(),
       findAll: jest.fn(),
     };
 
@@ -40,12 +43,19 @@ describe('LoginUseCase', () => {
       sign: jest.fn(),
     };
 
+    const mockPrismaService = {
+      subscription: {
+        findUnique: jest.fn(),
+      },
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LoginUseCase,
         { provide: 'UserRepository', useValue: mockUserRepository },
         { provide: BcryptHasher, useValue: mockHasher },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: PrismaService, useValue: mockPrismaService },
       ],
     }).compile();
 
@@ -53,6 +63,7 @@ describe('LoginUseCase', () => {
     userRepository = module.get('UserRepository');
     hasher = module.get(BcryptHasher);
     jwtService = module.get(JwtService);
+    prismaService = module.get(PrismaService);
   });
 
   it('should be defined', () => {
@@ -69,6 +80,9 @@ describe('LoginUseCase', () => {
       userRepository.findByEmail.mockResolvedValue(mockUser);
       hasher.compare.mockResolvedValue(true);
       jwtService.sign.mockReturnValue('jwt_token');
+      (prismaService.subscription.findUnique as jest.Mock).mockResolvedValue({
+        plan: 'FREE',
+      });
 
       const result = await useCase.execute(validInput);
 
@@ -77,6 +91,7 @@ describe('LoginUseCase', () => {
       expect(jwtService.sign).toHaveBeenCalled();
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('token', 'jwt_token');
+      expect(result.user).toHaveProperty('plan', 'FREE');
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
@@ -98,11 +113,15 @@ describe('LoginUseCase', () => {
       userRepository.findByEmail.mockResolvedValue(mockUser);
       hasher.compare.mockResolvedValue(true);
       jwtService.sign.mockReturnValue('jwt_token');
+      (prismaService.subscription.findUnique as jest.Mock).mockResolvedValue({
+        plan: 'PRO',
+      });
 
       const result = await useCase.execute(validInput);
 
       expect(result.user.id).toBe(mockUser.id);
       expect(result.user.email).toBe(mockUser.email);
+      expect(result.user.plan).toBe('PRO');
     });
   });
 });

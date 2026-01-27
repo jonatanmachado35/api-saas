@@ -33,6 +33,17 @@ export declare class ListChatsUseCase {
     constructor(chatRepository: PrismaChatRepository);
     execute(userId: string): Promise<any[]>;
 }
+export declare class ListMessagesUseCase {
+    private readonly chatRepository;
+    constructor(chatRepository: PrismaChatRepository);
+    execute(chatId: string, userId: string): Promise<{
+        id: string;
+        chat_id: string;
+        content: string;
+        sender: string;
+        timestamp: Date;
+    }[]>;
+}
 export declare class CreateChatUseCase {
     private readonly chatRepository;
     private readonly agentRepository;
@@ -44,5 +55,12 @@ export declare class CreateChatUseCase {
         title: string | null | undefined;
         created_at: Date | undefined;
         updated_at: Date | undefined;
+    }>;
+}
+export declare class ClearChatUseCase {
+    private readonly chatRepository;
+    constructor(chatRepository: PrismaChatRepository);
+    execute(chatId: string, userId: string): Promise<{
+        message: string;
     }>;
 }

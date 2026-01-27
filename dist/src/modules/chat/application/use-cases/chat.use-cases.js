@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateChatUseCase = exports.ListChatsUseCase = exports.SendMessageUseCase = void 0;
+exports.ClearChatUseCase = exports.CreateChatUseCase = exports.ListMessagesUseCase = exports.ListChatsUseCase = exports.SendMessageUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_chat_repository_1 = require("../../infra/repositories/prisma-chat.repository");
 const chat_entity_1 = require("../../domain/entities/chat.entity");
@@ -106,6 +106,34 @@ exports.ListChatsUseCase = ListChatsUseCase = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository])
 ], ListChatsUseCase);
+let ListMessagesUseCase = class ListMessagesUseCase {
+    chatRepository;
+    constructor(chatRepository) {
+        this.chatRepository = chatRepository;
+    }
+    async execute(chatId, userId) {
+        const chat = await this.chatRepository.findById(chatId);
+        if (!chat) {
+            throw new common_1.NotFoundException('Chat not found');
+        }
+        if (chat.userId !== userId) {
+            throw new common_1.NotFoundException('Chat not found');
+        }
+        const messages = await this.chatRepository.findMessagesByChatId(chatId);
+        return messages.map(m => ({
+            id: m.id,
+            chat_id: m.chatId,
+            content: m.content,
+            sender: m.sender.toLowerCase(),
+            timestamp: m.props.timestamp || new Date(),
+        }));
+    }
+};
+exports.ListMessagesUseCase = ListMessagesUseCase;
+exports.ListMessagesUseCase = ListMessagesUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository])
+], ListMessagesUseCase);
 let CreateChatUseCase = class CreateChatUseCase {
     chatRepository;
     agentRepository;
@@ -135,4 +163,28 @@ exports.CreateChatUseCase = CreateChatUseCase = __decorate([
     __param(1, (0, common_1.Inject)('AgentRepository')),
     __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository, Object])
 ], CreateChatUseCase);
+let ClearChatUseCase = class ClearChatUseCase {
+    chatRepository;
+    constructor(chatRepository) {
+        this.chatRepository = chatRepository;
+    }
+    async execute(chatId, userId) {
+        const chat = await this.chatRepository.findById(chatId);
+        if (!chat) {
+            throw new common_1.NotFoundException('Chat not found');
+        }
+        if (chat.userId !== userId) {
+            throw new common_1.NotFoundException('Chat not found');
+        }
+        await this.chatRepository.deleteMessagesByChatId(chatId);
+        return {
+            message: 'Chat cleared successfully',
+        };
+    }
+};
+exports.ClearChatUseCase = ClearChatUseCase;
+exports.ClearChatUseCase = ClearChatUseCase = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository])
+], ClearChatUseCase);
 //# sourceMappingURL=chat.use-cases.js.map

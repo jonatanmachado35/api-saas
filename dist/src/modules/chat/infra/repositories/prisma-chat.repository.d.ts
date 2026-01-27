@@ -10,4 +10,5 @@ export declare class PrismaChatRepository {
     findByUserIdWithLastMessage(userId: string): Promise<any[]>;
     saveMessage(message: Message): Promise<void>;
     findMessagesByChatId(chatId: string): Promise<Message[]>;
+    deleteMessagesByChatId(chatId: string): Promise<void>;
 }

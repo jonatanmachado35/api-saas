@@ -26,6 +26,8 @@ exports.ChatModule = ChatModule = __decorate([
             chat_use_cases_1.ListChatsUseCase,
             chat_use_cases_1.SendMessageUseCase,
             chat_use_cases_1.CreateChatUseCase,
+            chat_use_cases_1.ListMessagesUseCase,
+            chat_use_cases_1.ClearChatUseCase,
             ai_chat_service_1.AiChatService,
         ],
         exports: [prisma_chat_repository_1.PrismaChatRepository],

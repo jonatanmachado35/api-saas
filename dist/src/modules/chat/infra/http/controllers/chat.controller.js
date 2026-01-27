@@ -24,10 +24,14 @@ let ChatController = class ChatController {
     listUseCase;
     sendUseCase;
     createUseCase;
-    constructor(listUseCase, sendUseCase, createUseCase) {
+    listMessagesUseCase;
+    clearChatUseCase;
+    constructor(listUseCase, sendUseCase, createUseCase, listMessagesUseCase, clearChatUseCase) {
         this.listUseCase = listUseCase;
         this.sendUseCase = sendUseCase;
         this.createUseCase = createUseCase;
+        this.listMessagesUseCase = listMessagesUseCase;
+        this.clearChatUseCase = clearChatUseCase;
     }
     async list(user) {
         return this.listUseCase.execute(user.id);
@@ -35,8 +39,14 @@ let ChatController = class ChatController {
     async create(user, body) {
         return this.createUseCase.execute(user.id, body.agent_id, body.title);
     }
+    async listMessages(chatId, user) {
+        return this.listMessagesUseCase.execute(chatId, user.id);
+    }
     async sendMessage(chatId, body) {
         return this.sendUseCase.execute(chatId, body.content, chat_entity_1.MessageSender.USER);
+    }
+    async clearChat(chatId, user) {
+        return this.clearChatUseCase.execute(chatId, user.id);
     }
 };
 exports.ChatController = ChatController;
@@ -62,6 +72,17 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "create", null);
 __decorate([
+    (0, common_1.Get)(':chat_id/messages'),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar mensagens de um chat' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de mensagens do chat' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Chat nao encontrado' }),
+    __param(0, (0, common_1.Param)('chat_id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "listMessages", null);
+__decorate([
     (0, common_1.Post)(':chat_id/messages'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Enviar mensagem no chat' }),
@@ -73,6 +94,18 @@ __decorate([
     __metadata("design:paramtypes", [String, chat_dto_1.SendMessageDto]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "sendMessage", null);
+__decorate([
+    (0, common_1.Delete)(':chat_id/messages'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Limpar todas as mensagens de um chat' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Chat limpo com sucesso' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Chat nao encontrado' }),
+    __param(0, (0, common_1.Param)('chat_id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "clearChat", null);
 exports.ChatController = ChatController = __decorate([
     (0, swagger_1.ApiTags)('Chats'),
     (0, common_1.Controller)('chats'),
@@ -80,6 +113,8 @@ exports.ChatController = ChatController = __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     __metadata("design:paramtypes", [chat_use_cases_1.ListChatsUseCase,
         chat_use_cases_1.SendMessageUseCase,
-        chat_use_cases_1.CreateChatUseCase])
+        chat_use_cases_1.CreateChatUseCase,
+        chat_use_cases_1.ListMessagesUseCase,
+        chat_use_cases_1.ClearChatUseCase])
 ], ChatController);
 //# sourceMappingURL=chat.controller.js.map

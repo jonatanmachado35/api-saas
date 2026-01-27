@@ -128,4 +128,10 @@ export class PrismaChatRepository {
         ),
     );
   }
+
+  async deleteMessagesByChatId(chatId: string): Promise<void> {
+    await this.prisma.message.deleteMany({
+      where: { chat_id: chatId },
+    });
+  }
 }
