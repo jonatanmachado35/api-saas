@@ -1,0 +1,67 @@
+image: node:22
+
+stages:
+  - install
+  - test
+  - quality
+  - deploy
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+install:
+  stage: install
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+
+test:
+  stage: test
+  dependencies:
+    - install
+  script:
+    - npm test -- --coverage --coverageReporters=lcov
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    paths:
+      - coverage/
+    expire_in: 1 week
+  only:
+    - main
+    - merge_requests
+
+sonarcloud:
+  stage: quality
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  script:
+    - sonar-scanner
+      -Dsonar.projectKey=jonatanmachado35_api-saas
+      -Dsonar.organization=jonatanmachado35
+      -Dsonar.sources=src
+      -Dsonar.tests=src
+      -Dsonar.test.inclusions=**/*.spec.ts,**/*.test.ts
+      -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**
+      -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+      -Dsonar.host.url=https://sonarcloud.io
+      -Dsonar.login=${SONAR_TOKEN}
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - curl -X POST "$RENDER_DEPLOY_HOOK"
+  only:
+    - main
+  when: on_success
