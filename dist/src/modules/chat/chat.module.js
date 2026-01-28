@@ -14,12 +14,13 @@ const chat_use_cases_1 = require("./application/use-cases/chat.use-cases");
 const iam_module_1 = require("../iam/iam.module");
 const ai_chat_service_1 = require("./infra/external-api/ai-chat.service");
 const agents_module_1 = require("../agents/agents.module");
+const subscription_module_1 = require("../subscription/subscription.module");
 let ChatModule = class ChatModule {
 };
 exports.ChatModule = ChatModule;
 exports.ChatModule = ChatModule = __decorate([
     (0, common_1.Module)({
-        imports: [iam_module_1.IamModule, agents_module_1.AgentsModule],
+        imports: [iam_module_1.IamModule, agents_module_1.AgentsModule, subscription_module_1.SubscriptionModule],
         controllers: [chat_controller_1.ChatController],
         providers: [
             prisma_chat_repository_1.PrismaChatRepository,

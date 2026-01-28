@@ -20,16 +20,29 @@ const ai_chat_service_1 = require("../../infra/external-api/ai-chat.service");
 let SendMessageUseCase = class SendMessageUseCase {
     chatRepository;
     agentRepository;
+    subscriptionRepository;
     aiChatService;
-    constructor(chatRepository, agentRepository, aiChatService) {
+    constructor(chatRepository, agentRepository, subscriptionRepository, aiChatService) {
         this.chatRepository = chatRepository;
         this.agentRepository = agentRepository;
+        this.subscriptionRepository = subscriptionRepository;
         this.aiChatService = aiChatService;
     }
-    async execute(chatId, content, sender) {
+    async execute(chatId, content, sender, userId) {
         const chat = await this.chatRepository.findById(chatId);
         if (!chat) {
             throw new common_1.NotFoundException('Chat not found');
+        }
+        if (sender === chat_entity_1.MessageSender.USER) {
+            const subscription = await this.subscriptionRepository.findByUserId(userId);
+            if (!subscription) {
+                throw new common_1.NotFoundException('Subscription not found');
+            }
+            if (subscription.credits < 1) {
+                throw new common_1.ForbiddenException('Créditos insuficientes. Você precisa de pelo menos 1 crédito para enviar uma mensagem.');
+            }
+            subscription.deductCredits(1);
+            await this.subscriptionRepository.save(subscription);
         }
         const message = new chat_entity_1.Message({
             chatId,
@@ -89,7 +102,8 @@ exports.SendMessageUseCase = SendMessageUseCase;
 exports.SendMessageUseCase = SendMessageUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)('AgentRepository')),
-    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository, Object, ai_chat_service_1.AiChatService])
+    __param(2, (0, common_1.Inject)('SubscriptionRepository')),
+    __metadata("design:paramtypes", [prisma_chat_repository_1.PrismaChatRepository, Object, Object, ai_chat_service_1.AiChatService])
 ], SendMessageUseCase);
 let ListChatsUseCase = class ListChatsUseCase {
     chatRepository;

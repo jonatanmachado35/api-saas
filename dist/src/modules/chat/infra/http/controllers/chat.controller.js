@@ -42,8 +42,8 @@ let ChatController = class ChatController {
     async listMessages(chatId, user) {
         return this.listMessagesUseCase.execute(chatId, user.id);
     }
-    async sendMessage(chatId, body) {
-        return this.sendUseCase.execute(chatId, body.content, chat_entity_1.MessageSender.USER);
+    async sendMessage(chatId, body, user) {
+        return this.sendUseCase.execute(chatId, body.content, chat_entity_1.MessageSender.USER, user.id);
     }
     async clearChat(chatId, user) {
         return this.clearChatUseCase.execute(chatId, user.id);
@@ -85,13 +85,15 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':chat_id/messages'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Enviar mensagem no chat' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Enviar mensagem no chat (consome 1 crédito)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Mensagem enviada com sucesso' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Chat nao encontrado' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Creditos insuficientes' }),
     __param(0, (0, common_1.Param)('chat_id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, chat_dto_1.SendMessageDto]),
+    __metadata("design:paramtypes", [String, chat_dto_1.SendMessageDto, Object]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "sendMessage", null);
 __decorate([

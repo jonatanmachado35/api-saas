@@ -5,9 +5,10 @@ import { ListChatsUseCase, SendMessageUseCase, CreateChatUseCase, ListMessagesUs
 import { IamModule } from '../iam/iam.module';
 import { AiChatService } from './infra/external-api/ai-chat.service';
 import { AgentsModule } from '../agents/agents.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
-  imports: [IamModule, AgentsModule],
+  imports: [IamModule, AgentsModule, SubscriptionModule],
   controllers: [ChatController],
   providers: [
     PrismaChatRepository,

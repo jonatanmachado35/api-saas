@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, ForbiddenException } from '@nestjs/common';
 import { PrismaChatRepository } from '../../infra/repositories/prisma-chat.repository';
 import { Message, MessageSender } from '../../domain/entities/chat.entity';
 import { AgentRepository } from '../../../agents/domain/repositories/agent.repository.interface';
 import { AiChatService } from '../../infra/external-api/ai-chat.service';
+import { SubscriptionRepository } from '../../../subscription/domain/repositories/subscription.repository.interface';
 
 @Injectable()
 export class SendMessageUseCase {
@@ -10,13 +11,34 @@ export class SendMessageUseCase {
     private readonly chatRepository: PrismaChatRepository,
     @Inject('AgentRepository')
     private readonly agentRepository: AgentRepository,
+    @Inject('SubscriptionRepository')
+    private readonly subscriptionRepository: SubscriptionRepository,
     private readonly aiChatService: AiChatService,
   ) {}
 
-  async execute(chatId: string, content: string, sender: MessageSender) {
+  async execute(chatId: string, content: string, sender: MessageSender, userId: string) {
     const chat = await this.chatRepository.findById(chatId);
     if (!chat) {
       throw new NotFoundException('Chat not found');
+    }
+
+    // If sender is USER, verify and consume credits
+    if (sender === MessageSender.USER) {
+      // Verificar saldo de créditos
+      const subscription = await this.subscriptionRepository.findByUserId(userId);
+      if (!subscription) {
+        throw new NotFoundException('Subscription not found');
+      }
+
+      if (subscription.credits < 1) {
+        throw new ForbiddenException(
+          'Créditos insuficientes. Você precisa de pelo menos 1 crédito para enviar uma mensagem.'
+        );
+      }
+
+      // Descontar 1 crédito ANTES de processar a mensagem
+      subscription.deductCredits(1);
+      await this.subscriptionRepository.save(subscription);
     }
 
     const message = new Message({

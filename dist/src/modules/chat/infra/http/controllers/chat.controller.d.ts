@@ -23,7 +23,7 @@ export declare class ChatController {
         sender: string;
         timestamp: Date;
     }[]>;
-    sendMessage(chatId: string, body: SendMessageDto): Promise<{
+    sendMessage(chatId: string, body: SendMessageDto, user: any): Promise<{
         id: string;
         chat_id: string;
         content: string;

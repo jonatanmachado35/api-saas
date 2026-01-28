@@ -48,14 +48,16 @@ export class ChatController {
 
   @Post(':chat_id/messages')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Enviar mensagem no chat' })
+  @ApiOperation({ summary: 'Enviar mensagem no chat (consome 1 crédito)' })
   @ApiResponse({ status: 200, description: 'Mensagem enviada com sucesso' })
   @ApiResponse({ status: 404, description: 'Chat nao encontrado' })
+  @ApiResponse({ status: 403, description: 'Creditos insuficientes' })
   async sendMessage(
     @Param('chat_id') chatId: string,
     @Body() body: SendMessageDto,
+    @CurrentUser() user: any,
   ) {
-    return this.sendUseCase.execute(chatId, body.content, MessageSender.USER);
+    return this.sendUseCase.execute(chatId, body.content, MessageSender.USER, user.id);
   }
 
   @Delete(':chat_id/messages')
