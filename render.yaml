@@ -3,7 +3,7 @@
 
 services:
   - type: web
-    name: agentchat-api
+    name: api-saas-1
     env: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
