@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../../../../iam/infra/security/jwt-auth.guard");
 const roles_guard_1 = require("../../../../../core/guards/roles.guard");
 const roles_decorator_1 = require("../../../../../core/decorators/roles.decorator");
+const user_entity_1 = require("../../../../iam/domain/entities/user.entity");
 const product_use_cases_1 = require("../../../application/use-cases/product.use-cases");
 const product_dto_1 = require("../dtos/product.dto");
 let ProductController = class ProductController {
@@ -87,7 +88,7 @@ let AdminProductController = class AdminProductController {
 exports.AdminProductController = AdminProductController;
 __decorate([
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)('admin'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Listar todos os produtos (incluindo inativos)' }),
     (0, swagger_1.ApiQuery)({ name: 'activeOnly', required: false, type: Boolean }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de produtos' }),
@@ -98,7 +99,7 @@ __decorate([
 ], AdminProductController.prototype, "listAll", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)('admin'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({ summary: 'Criar novo produto' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Produto criado com sucesso' }),
@@ -110,7 +111,7 @@ __decorate([
 ], AdminProductController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':id'),
-    (0, roles_decorator_1.Roles)('admin'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Atualizar produto' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Produto atualizado com sucesso' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Produto não encontrado' }),
@@ -122,7 +123,7 @@ __decorate([
 ], AdminProductController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, roles_decorator_1.Roles)('admin'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     (0, swagger_1.ApiOperation)({ summary: 'Deletar produto' }),
     (0, swagger_1.ApiResponse)({ status: 204, description: 'Produto deletado com sucesso' }),

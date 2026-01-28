@@ -15,6 +15,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@ne
 import { JwtAuthGuard } from '../../../../iam/infra/security/jwt-auth.guard';
 import { RolesGuard } from '../../../../../core/guards/roles.guard';
 import { Roles } from '../../../../../core/decorators/roles.decorator';
+import { UserRole } from '../../../../iam/domain/entities/user.entity';
 import {
   ListProductsUseCase,
   GetProductBySlugUseCase,
@@ -61,7 +62,7 @@ export class AdminProductController {
   ) {}
 
   @Get()
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Listar todos os produtos (incluindo inativos)' })
   @ApiQuery({ name: 'activeOnly', required: false, type: Boolean })
   @ApiResponse({ status: 200, description: 'Lista de produtos' })
@@ -71,7 +72,7 @@ export class AdminProductController {
   }
 
   @Post()
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Criar novo produto' })
   @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
@@ -81,7 +82,7 @@ export class AdminProductController {
   }
 
   @Put(':id')
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Atualizar produto' })
   @ApiResponse({ status: 200, description: 'Produto atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Produto não encontrado' })
@@ -90,7 +91,7 @@ export class AdminProductController {
   }
 
   @Delete(':id')
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Deletar produto' })
   @ApiResponse({ status: 204, description: 'Produto deletado com sucesso' })
