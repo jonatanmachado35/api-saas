@@ -44,19 +44,16 @@ export class SendMessageUseCase {
         }
       }
 
-      // Verificar saldo de créditos com estimativa conservadora
+      // Verificar saldo de créditos
       subscription = await this.subscriptionRepository.findByUserId(userId);
       if (!subscription) {
         throw new NotFoundException('Subscription not found');
       }
 
-      // Estimativa: assumir um custo médio de API de 0.001 (ajuste conforme necessário)
-      const estimatedApiCost = 0.001;
-      const estimatedCredits = Math.ceil(estimatedApiCost * llmCreditCost * 10000);
-
-      if (subscription.credits < estimatedCredits) {
+      // Verificar mínimo de 6 créditos
+      if (subscription.credits < 6) {
         throw new ForbiddenException(
-          `Créditos insuficientes. Você precisa de pelo menos ${estimatedCredits} crédito(s) para enviar uma mensagem com este agente.`
+          `Créditos insuficientes. Você precisa de pelo menos 6 créditos para enviar uma mensagem.`
         );
       }
     }
