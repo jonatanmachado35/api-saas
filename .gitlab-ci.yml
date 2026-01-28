@@ -46,7 +46,7 @@ sonarcloud:
   script:
     - sonar-scanner
       -Dsonar.projectKey=jonatanmachado35_api-saas
-      -Dsonar.organization=jonatanmachado35
+      -Dsonar.organization=flkc6ifa4f0ypybdzzugl4hq6n
       -Dsonar.sources=src
       -Dsonar.tests=src
       -Dsonar.test.inclusions=**/*.spec.ts,**/*.test.ts
