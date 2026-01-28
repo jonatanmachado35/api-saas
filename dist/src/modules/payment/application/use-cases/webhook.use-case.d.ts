@@ -25,4 +25,7 @@ export declare class ProcessPaymentWebhookUseCase {
     private handlePaidPayment;
     private handleSubscriptionPayment;
     private handleCreditsPayment;
+    private handleDisputedPayment;
+    private revertSubscription;
+    private revertCredits;
 }

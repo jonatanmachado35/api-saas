@@ -201,8 +201,14 @@ CREATE TABLE "payments" (
 1. **Modo DEV**: API key atual é de homologação (`sk-p5dY6E8s2ae...`)
 2. **Idempotência**: AbacatePay é idempotente, pode reenviar requisições
 3. **Webhook**: Configure a URL no painel AbacatePay: `https://sua-api.com/webhooks/abacatepay`
+   - **Eventos necessários:**
+     - ✅ `billing.paid` - Confirma pagamento e ativa plano/créditos
+     - ✅ `billing.disputed` - Reverte plano/créditos em caso de chargeback
+     - ❌ `withdraw.done` - Não necessário
+     - ❌ `withdraw.failed` - Não necessário
 4. **Segurança**: Webhook é público (sem auth) — validar assinatura em produção
 5. **Metadata**: Sempre inclua `paymentId` para rastreamento
+6. **Disputas**: Sistema reverte automaticamente créditos/planos em caso de chargeback
 
 ## 🧪 Testando
 

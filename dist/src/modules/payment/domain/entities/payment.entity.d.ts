@@ -41,4 +41,5 @@ export declare class Payment extends Entity<PaymentProps> {
     markAsPaid(externalId: string): void;
     markAsFailed(): void;
     cancel(): void;
+    refund(): void;
 }

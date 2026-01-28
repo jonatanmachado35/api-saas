@@ -24,7 +24,7 @@ export class ProcessPaymentWebhookUseCase {
   ) {}
 
   async execute(payload: WebhookPayload) {
-    this.logger.log(`Processing webhook for billing: ${payload.id}`);
+    this.logger.log(`Processing webhook for billing: ${payload.id} - Status: ${payload.status}`);
 
     // Buscar payment pelo external_id
     const payment = await this.paymentRepository.findByExternalId(payload.id);
@@ -34,19 +34,25 @@ export class ProcessPaymentWebhookUseCase {
       throw new BadRequestException('Payment not found');
     }
 
-    // Já processado
-    if (payment.status === PaymentStatus.PAID) {
-      this.logger.log(`Payment already processed: ${payment.id}`);
-      return { success: true, message: 'Already processed' };
-    }
-
     // Processar pagamento baseado no status
     const status = payload.status.toUpperCase();
 
+    // Pagamento confirmado
     if (status === 'PAID' || status === 'COMPLETED') {
+      // Já processado
+      if (payment.status === PaymentStatus.PAID) {
+        this.logger.log(`Payment already processed: ${payment.id}`);
+        return { success: true, message: 'Already processed' };
+      }
       return await this.handlePaidPayment(payment, payload);
     }
 
+    // Disputa/Chargeback
+    if (status === 'DISPUTED') {
+      return await this.handleDisputedPayment(payment);
+    }
+
+    // Falha ou cancelamento
     if (status === 'FAILED' || status === 'CANCELED') {
       payment.markAsFailed();
       await this.paymentRepository.save(payment);
@@ -132,5 +138,81 @@ export class ProcessPaymentWebhookUseCase {
     await this.subscriptionRepository.save(updatedSubscription);
 
     this.logger.log(`Added ${totalCredits} credits to user ${userId}`);
+  }
+
+  private async handleDisputedPayment(payment: any) {
+    this.logger.warn(`Payment disputed: ${payment.id} - Type: ${payment.type}`);
+
+    // Marcar como REFUNDED
+    payment.refund();
+    await this.paymentRepository.save(payment);
+
+    const metadata = payment.metadata || {};
+
+    // Reverter assinatura se foi disputada
+    if (payment.type === 'SUBSCRIPTION') {
+      await this.revertSubscription(payment.userId, metadata);
+    }
+
+    // Remover créditos se foi disputado
+    if (payment.type === 'CREDITS') {
+      await this.revertCredits(payment.userId, metadata);
+    }
+
+    this.logger.log(`Payment dispute processed: ${payment.id}`);
+
+    return { success: true, paymentId: payment.id, action: 'disputed' };
+  }
+
+  private async revertSubscription(userId: string, metadata: any) {
+    const subscription = await this.subscriptionRepository.findByUserId(userId);
+
+    if (!subscription) {
+      this.logger.warn(`Subscription not found for user: ${userId}`);
+      return;
+    }
+
+    // Downgrade para FREE
+    const updatedSubscription = new Subscription(
+      {
+        ...subscription.props,
+        plan: SubscriptionPlan.FREE,
+        status: SubscriptionStatus.ACTIVE,
+        credits: 50, // Resetar para créditos gratuitos
+      },
+      subscription.id,
+    );
+
+    await this.subscriptionRepository.save(updatedSubscription);
+
+    this.logger.warn(`Subscription downgraded to FREE due to dispute for user ${userId}`);
+  }
+
+  private async revertCredits(userId: string, metadata: any) {
+    const subscription = await this.subscriptionRepository.findByUserId(userId);
+
+    if (!subscription) {
+      this.logger.warn(`Subscription not found for user: ${userId}`);
+      return;
+    }
+
+    const credits = metadata.credits || 0;
+    const bonus = metadata.bonus || 0;
+    const totalCredits = credits + bonus;
+
+    // Remover créditos (não permitir negativo)
+    const newCredits = Math.max(0, subscription.credits - totalCredits);
+
+    const updatedSubscription = new Subscription(
+      {
+        ...subscription.props,
+        credits: newCredits,
+      },
+      subscription.id,
+    );
+
+    await this.subscriptionRepository.save(updatedSubscription);
+
+    this.logger.warn(`Removed ${totalCredits} credits from user ${userId} due to dispute`);
   }
 }

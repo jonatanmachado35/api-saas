@@ -46,6 +46,10 @@ class Payment extends base_classes_1.Entity {
         this.props.status = PaymentStatus.CANCELED;
         this.props.updatedAt = new Date();
     }
+    refund() {
+        this.props.status = PaymentStatus.REFUNDED;
+        this.props.updatedAt = new Date();
+    }
 }
 exports.Payment = Payment;
 //# sourceMappingURL=payment.entity.js.map

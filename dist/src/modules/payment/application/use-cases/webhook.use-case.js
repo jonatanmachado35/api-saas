@@ -26,19 +26,22 @@ let ProcessPaymentWebhookUseCase = ProcessPaymentWebhookUseCase_1 = class Proces
         this.subscriptionRepository = subscriptionRepository;
     }
     async execute(payload) {
-        this.logger.log(`Processing webhook for billing: ${payload.id}`);
+        this.logger.log(`Processing webhook for billing: ${payload.id} - Status: ${payload.status}`);
         const payment = await this.paymentRepository.findByExternalId(payload.id);
         if (!payment) {
             this.logger.warn(`Payment not found for external_id: ${payload.id}`);
             throw new common_1.BadRequestException('Payment not found');
         }
-        if (payment.status === payment_entity_1.PaymentStatus.PAID) {
-            this.logger.log(`Payment already processed: ${payment.id}`);
-            return { success: true, message: 'Already processed' };
-        }
         const status = payload.status.toUpperCase();
         if (status === 'PAID' || status === 'COMPLETED') {
+            if (payment.status === payment_entity_1.PaymentStatus.PAID) {
+                this.logger.log(`Payment already processed: ${payment.id}`);
+                return { success: true, message: 'Already processed' };
+            }
             return await this.handlePaidPayment(payment, payload);
+        }
+        if (status === 'DISPUTED') {
+            return await this.handleDisputedPayment(payment);
         }
         if (status === 'FAILED' || status === 'CANCELED') {
             payment.markAsFailed();
@@ -97,6 +100,52 @@ let ProcessPaymentWebhookUseCase = ProcessPaymentWebhookUseCase_1 = class Proces
         }, subscription.id);
         await this.subscriptionRepository.save(updatedSubscription);
         this.logger.log(`Added ${totalCredits} credits to user ${userId}`);
+    }
+    async handleDisputedPayment(payment) {
+        this.logger.warn(`Payment disputed: ${payment.id} - Type: ${payment.type}`);
+        payment.refund();
+        await this.paymentRepository.save(payment);
+        const metadata = payment.metadata || {};
+        if (payment.type === 'SUBSCRIPTION') {
+            await this.revertSubscription(payment.userId, metadata);
+        }
+        if (payment.type === 'CREDITS') {
+            await this.revertCredits(payment.userId, metadata);
+        }
+        this.logger.log(`Payment dispute processed: ${payment.id}`);
+        return { success: true, paymentId: payment.id, action: 'disputed' };
+    }
+    async revertSubscription(userId, metadata) {
+        const subscription = await this.subscriptionRepository.findByUserId(userId);
+        if (!subscription) {
+            this.logger.warn(`Subscription not found for user: ${userId}`);
+            return;
+        }
+        const updatedSubscription = new subscription_entity_1.Subscription({
+            ...subscription.props,
+            plan: subscription_entity_1.SubscriptionPlan.FREE,
+            status: subscription_entity_1.SubscriptionStatus.ACTIVE,
+            credits: 50,
+        }, subscription.id);
+        await this.subscriptionRepository.save(updatedSubscription);
+        this.logger.warn(`Subscription downgraded to FREE due to dispute for user ${userId}`);
+    }
+    async revertCredits(userId, metadata) {
+        const subscription = await this.subscriptionRepository.findByUserId(userId);
+        if (!subscription) {
+            this.logger.warn(`Subscription not found for user: ${userId}`);
+            return;
+        }
+        const credits = metadata.credits || 0;
+        const bonus = metadata.bonus || 0;
+        const totalCredits = credits + bonus;
+        const newCredits = Math.max(0, subscription.credits - totalCredits);
+        const updatedSubscription = new subscription_entity_1.Subscription({
+            ...subscription.props,
+            credits: newCredits,
+        }, subscription.id);
+        await this.subscriptionRepository.save(updatedSubscription);
+        this.logger.warn(`Removed ${totalCredits} credits from user ${userId} due to dispute`);
     }
 };
 exports.ProcessPaymentWebhookUseCase = ProcessPaymentWebhookUseCase;

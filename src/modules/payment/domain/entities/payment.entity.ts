@@ -62,4 +62,9 @@ export class Payment extends Entity<PaymentProps> {
     this.props.status = PaymentStatus.CANCELED;
     this.props.updatedAt = new Date();
   }
+
+  refund(): void {
+    this.props.status = PaymentStatus.REFUNDED;
+    this.props.updatedAt = new Date();
+  }
 }
