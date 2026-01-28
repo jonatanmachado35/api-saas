@@ -19,6 +19,22 @@ export interface ChatRequest {
   agent: AgentConfig;
 }
 
+export interface AiApiResponse {
+  response?: string;
+  message?: string;
+  usage?: {
+    cost: number;
+    completion_tokens: number;
+    prompt_tokens: number;
+    total_tokens: number;
+  };
+  choices?: Array<{
+    message: {
+      content: string;
+    };
+  }>;
+}
+
 @Injectable()
 export class AiChatService {
   private readonly aiApiUrl: string;
@@ -27,7 +43,7 @@ export class AiChatService {
     this.aiApiUrl = this.configService.get<string>('AI_API_URL') || 'https://api-ia-rt8v.onrender.com';
   }
 
-  async sendMessage(request: ChatRequest): Promise<any> {
+  async sendMessage(request: ChatRequest): Promise<AiApiResponse> {
     try {
       const response = await axios.post(`${this.aiApiUrl}/chat`, request, {
         headers: {

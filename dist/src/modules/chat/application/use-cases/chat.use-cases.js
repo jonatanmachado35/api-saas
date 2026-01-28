@@ -36,27 +36,28 @@ let SendMessageUseCase = class SendMessageUseCase {
         if (!chat) {
             throw new common_1.NotFoundException('Chat not found');
         }
+        const agent = await this.agentRepository.findById(chat.agentId);
+        if (!agent) {
+            throw new common_1.NotFoundException('Agent not found');
+        }
+        let subscription;
+        let llmCreditCost = 1;
         if (sender === chat_entity_1.MessageSender.USER) {
-            const agent = await this.agentRepository.findById(chat.agentId);
-            if (!agent) {
-                throw new common_1.NotFoundException('Agent not found');
-            }
-            let creditCost = 1;
             if (agent.llmId) {
                 const llm = await this.llmRepository.findById(agent.llmId);
                 if (llm) {
-                    creditCost = llm.creditCost;
+                    llmCreditCost = llm.creditCost;
                 }
             }
-            const subscription = await this.subscriptionRepository.findByUserId(userId);
+            subscription = await this.subscriptionRepository.findByUserId(userId);
             if (!subscription) {
                 throw new common_1.NotFoundException('Subscription not found');
             }
-            if (subscription.credits < creditCost) {
-                throw new common_1.ForbiddenException(`Créditos insuficientes. Você precisa de pelo menos ${creditCost} crédito(s) para enviar uma mensagem com este agente.`);
+            const estimatedApiCost = 0.001;
+            const estimatedCredits = Math.ceil(estimatedApiCost * llmCreditCost * 10000);
+            if (subscription.credits < estimatedCredits) {
+                throw new common_1.ForbiddenException(`Créditos insuficientes. Você precisa de pelo menos ${estimatedCredits} crédito(s) para enviar uma mensagem com este agente.`);
             }
-            subscription.deductCredits(creditCost);
-            await this.subscriptionRepository.save(subscription);
         }
         const message = new chat_entity_1.Message({
             chatId,
@@ -65,10 +66,6 @@ let SendMessageUseCase = class SendMessageUseCase {
         });
         await this.chatRepository.saveMessage(message);
         if (sender === chat_entity_1.MessageSender.USER) {
-            const agent = await this.agentRepository.findById(chat.agentId);
-            if (!agent) {
-                throw new common_1.NotFoundException('Agent not found');
-            }
             const rules = agent.rules ? agent.rules.split('\n').filter(r => r.trim()) : [];
             const aiResponse = await this.aiChatService.sendMessage({
                 message: content,
@@ -82,7 +79,21 @@ let SendMessageUseCase = class SendMessageUseCase {
                     rules,
                 },
             });
-            const agentMessage = aiResponse.response || aiResponse.message || 'Desculpe, não consegui processar sua mensagem.';
+            let creditsToDeduct = 1;
+            if (aiResponse.usage?.cost) {
+                creditsToDeduct = Math.ceil(aiResponse.usage.cost * llmCreditCost * 10000);
+                if (creditsToDeduct < 1) {
+                    creditsToDeduct = 1;
+                }
+            }
+            if (subscription.credits < creditsToDeduct) {
+                throw new common_1.ForbiddenException(`Créditos insuficientes para processar esta mensagem. Necessário: ${creditsToDeduct} crédito(s).`);
+            }
+            subscription.deductCredits(creditsToDeduct);
+            await this.subscriptionRepository.save(subscription);
+            const agentMessage = aiResponse.response || aiResponse.message ||
+                (aiResponse.choices?.[0]?.message?.content) ||
+                'Desculpe, não consegui processar sua mensagem.';
             const agentResponse = new chat_entity_1.Message({
                 chatId,
                 content: agentMessage,

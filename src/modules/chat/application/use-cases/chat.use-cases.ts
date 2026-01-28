@@ -25,39 +25,40 @@ export class SendMessageUseCase {
       throw new NotFoundException('Chat not found');
     }
 
-    // If sender is USER, verify and consume credits
-    if (sender === MessageSender.USER) {
-      // Buscar dados do agent associado ao chat
-      const agent = await this.agentRepository.findById(chat.agentId);
-      if (!agent) {
-        throw new NotFoundException('Agent not found');
-      }
+    // Buscar dados do agent associado ao chat
+    const agent = await this.agentRepository.findById(chat.agentId);
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
 
-      // Determinar custo de créditos baseado no LLM
-      let creditCost = 1; // Padrão se não tiver LLM configurado
-      
+    let subscription;
+    let llmCreditCost = 1;
+
+    // If sender is USER, verify credits BEFORE calling API
+    if (sender === MessageSender.USER) {
+      // Determinar o creditCost do LLM para estimativa
       if (agent.llmId) {
         const llm = await this.llmRepository.findById(agent.llmId);
         if (llm) {
-          creditCost = llm.creditCost;
+          llmCreditCost = llm.creditCost;
         }
       }
 
-      // Verificar saldo de créditos
-      const subscription = await this.subscriptionRepository.findByUserId(userId);
+      // Verificar saldo de créditos com estimativa conservadora
+      subscription = await this.subscriptionRepository.findByUserId(userId);
       if (!subscription) {
         throw new NotFoundException('Subscription not found');
       }
 
-      if (subscription.credits < creditCost) {
+      // Estimativa: assumir um custo médio de API de 0.001 (ajuste conforme necessário)
+      const estimatedApiCost = 0.001;
+      const estimatedCredits = Math.ceil(estimatedApiCost * llmCreditCost * 10000);
+
+      if (subscription.credits < estimatedCredits) {
         throw new ForbiddenException(
-          `Créditos insuficientes. Você precisa de pelo menos ${creditCost} crédito(s) para enviar uma mensagem com este agente.`
+          `Créditos insuficientes. Você precisa de pelo menos ${estimatedCredits} crédito(s) para enviar uma mensagem com este agente.`
         );
       }
-
-      // Descontar créditos ANTES de processar a mensagem
-      subscription.deductCredits(creditCost);
-      await this.subscriptionRepository.save(subscription);
     }
 
     const message = new Message({
@@ -70,12 +71,6 @@ export class SendMessageUseCase {
 
     // If sender is USER, get agent config and call AI API
     if (sender === MessageSender.USER) {
-      // Buscar dados do agent associado ao chat
-      const agent = await this.agentRepository.findById(chat.agentId);
-      if (!agent) {
-        throw new NotFoundException('Agent not found');
-      }
-
       // Preparar regras como array
       const rules = agent.rules ? agent.rules.split('\n').filter(r => r.trim()) : [];
 
@@ -93,8 +88,35 @@ export class SendMessageUseCase {
         },
       });
 
+      // Calcular créditos com base no custo REAL da API
+      let creditsToDeduct = 1; // fallback padrão
+      
+      if (aiResponse.usage?.cost) {
+        // Fórmula: apiCost * creditCost * 10000, arredondado para cima
+        creditsToDeduct = Math.ceil(aiResponse.usage.cost * llmCreditCost * 10000);
+        
+        // Garantir pelo menos 1 crédito
+        if (creditsToDeduct < 1) {
+          creditsToDeduct = 1;
+        }
+      }
+
+      // Verificar novamente se há saldo suficiente (segurança)
+      if (subscription.credits < creditsToDeduct) {
+        throw new ForbiddenException(
+          `Créditos insuficientes para processar esta mensagem. Necessário: ${creditsToDeduct} crédito(s).`
+        );
+      }
+
+      // Descontar créditos APÓS processar a mensagem e ter o custo real
+      subscription.deductCredits(creditsToDeduct);
+      await this.subscriptionRepository.save(subscription);
+
       // Salvar resposta do agent
-      const agentMessage = aiResponse.response || aiResponse.message || 'Desculpe, não consegui processar sua mensagem.';
+      const agentMessage = aiResponse.response || aiResponse.message || 
+        (aiResponse.choices?.[0]?.message?.content) || 
+        'Desculpe, não consegui processar sua mensagem.';
+      
       const agentResponse = new Message({
         chatId,
         content: agentMessage,
