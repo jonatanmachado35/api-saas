@@ -40,7 +40,6 @@ let SendMessageUseCase = class SendMessageUseCase {
         if (!agent) {
             throw new common_1.NotFoundException('Agent not found');
         }
-        let subscription;
         let llmCreditCost = 1;
         if (sender === chat_entity_1.MessageSender.USER) {
             if (agent.llmId) {
@@ -49,23 +48,19 @@ let SendMessageUseCase = class SendMessageUseCase {
                     llmCreditCost = llm.creditCost;
                 }
             }
-            subscription = await this.subscriptionRepository.findByUserId(userId);
+            const subscription = await this.subscriptionRepository.findByUserId(userId);
             if (!subscription) {
                 throw new common_1.NotFoundException('Subscription not found');
             }
-            const estimatedApiCost = 0.001;
-            const estimatedCredits = Math.ceil(estimatedApiCost * llmCreditCost * 10000);
-            if (subscription.credits < estimatedCredits) {
-                throw new common_1.ForbiddenException(`Créditos insuficientes. Você precisa de pelo menos ${estimatedCredits} crédito(s) para enviar uma mensagem com este agente.`);
+            if (subscription.credits < 6) {
+                throw new common_1.ForbiddenException(`Créditos insuficientes. Você precisa de pelo menos 6 créditos para enviar uma mensagem.`);
             }
-        }
-        const message = new chat_entity_1.Message({
-            chatId,
-            content,
-            sender,
-        });
-        await this.chatRepository.saveMessage(message);
-        if (sender === chat_entity_1.MessageSender.USER) {
+            const message = new chat_entity_1.Message({
+                chatId,
+                content,
+                sender,
+            });
+            await this.chatRepository.saveMessage(message);
             const rules = agent.rules ? agent.rules.split('\n').filter(r => r.trim()) : [];
             const aiResponse = await this.aiChatService.sendMessage({
                 message: content,
@@ -114,6 +109,12 @@ let SendMessageUseCase = class SendMessageUseCase {
                 },
             };
         }
+        const message = new chat_entity_1.Message({
+            chatId,
+            content,
+            sender,
+        });
+        await this.chatRepository.saveMessage(message);
         return {
             id: message.id,
             chat_id: message.chatId,

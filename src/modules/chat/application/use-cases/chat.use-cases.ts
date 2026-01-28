@@ -31,7 +31,6 @@ export class SendMessageUseCase {
       throw new NotFoundException('Agent not found');
     }
 
-    let subscription;
     let llmCreditCost = 1;
 
     // If sender is USER, verify credits BEFORE calling API
@@ -45,7 +44,7 @@ export class SendMessageUseCase {
       }
 
       // Verificar saldo de créditos
-      subscription = await this.subscriptionRepository.findByUserId(userId);
+      const subscription = await this.subscriptionRepository.findByUserId(userId);
       if (!subscription) {
         throw new NotFoundException('Subscription not found');
       }
@@ -56,18 +55,15 @@ export class SendMessageUseCase {
           `Créditos insuficientes. Você precisa de pelo menos 6 créditos para enviar uma mensagem.`
         );
       }
-    }
 
-    const message = new Message({
-      chatId,
-      content,
-      sender,
-    });
+      const message = new Message({
+        chatId,
+        content,
+        sender,
+      });
 
-    await this.chatRepository.saveMessage(message);
+      await this.chatRepository.saveMessage(message);
 
-    // If sender is USER, get agent config and call AI API
-    if (sender === MessageSender.USER) {
       // Preparar regras como array
       const rules = agent.rules ? agent.rules.split('\n').filter(r => r.trim()) : [];
 
@@ -135,6 +131,14 @@ export class SendMessageUseCase {
         },
       };
     }
+
+    const message = new Message({
+      chatId,
+      content,
+      sender,
+    });
+
+    await this.chatRepository.saveMessage(message);
 
     return {
       id: message.id,

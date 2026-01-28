@@ -22,6 +22,21 @@ class Subscription extends base_classes_1.Entity {
     get plan() { return this.props.plan; }
     get status() { return this.props.status; }
     get credits() { return this.props.credits; }
+    deductCredits(amount) {
+        if (amount < 0) {
+            throw new Error('Amount must be positive');
+        }
+        if (this.props.credits < amount) {
+            throw new Error('Insufficient credits');
+        }
+        this.props.credits -= amount;
+    }
+    addCredits(amount) {
+        if (amount < 0) {
+            throw new Error('Amount must be positive');
+        }
+        this.props.credits += amount;
+    }
 }
 exports.Subscription = Subscription;
 //# sourceMappingURL=subscription.entity.js.map

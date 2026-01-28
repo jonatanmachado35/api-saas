@@ -23,4 +23,6 @@ export declare class Subscription extends Entity<SubscriptionProps> {
     get plan(): SubscriptionPlan;
     get status(): SubscriptionStatus;
     get credits(): number;
+    deductCredits(amount: number): void;
+    addCredits(amount: number): void;
 }
