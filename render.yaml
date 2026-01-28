@@ -12,8 +12,6 @@ services:
     branch: main
     healthCheckPath: /
     autoDeploy: true
-    buildCommand: npm run build
-    startCommand: npm run start:prod
     envVars:
       - key: NODE_ENV
         value: production
