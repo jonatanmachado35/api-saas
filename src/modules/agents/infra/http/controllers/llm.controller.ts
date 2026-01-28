@@ -42,6 +42,11 @@ export class CreateLlmDto {
   @IsNumber()
   @Min(1)
   maxTokens: number;
+
+  @ApiProperty({ example: 1, description: 'Custo em créditos por uso' })
+  @IsNumber()
+  @Min(1)
+  creditCost: number;
 }
 
 export class UpdateLlmDto {
@@ -65,6 +70,12 @@ export class UpdateLlmDto {
   @IsNumber()
   @Min(1)
   maxTokens?: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'Custo em créditos por uso' })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  creditCost?: number;
 
   @ApiPropertyOptional({ example: true, description: 'Se o LLM está ativo' })
   @IsOptional()

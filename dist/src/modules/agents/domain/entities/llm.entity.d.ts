@@ -4,6 +4,7 @@ export interface LlmProps {
     provider: string;
     model: string;
     maxTokens: number;
+    creditCost: number;
     active: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -14,11 +15,13 @@ export declare class Llm extends Entity<LlmProps> {
     get provider(): string;
     get model(): string;
     get maxTokens(): number;
+    get creditCost(): number;
     get active(): boolean;
     get createdAt(): Date | undefined;
     get updatedAt(): Date | undefined;
     activate(): void;
     deactivate(): void;
     updateMaxTokens(maxTokens: number): void;
+    updateCreditCost(creditCost: number): void;
     updateName(name: string): void;
 }

@@ -105,6 +105,7 @@ model Llm {
   provider   String
   model      String
   max_tokens Int
+  credit_cost Int     @default(1)
   active     Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

@@ -1,14 +1,16 @@
 import { PrismaChatRepository } from '../../infra/repositories/prisma-chat.repository';
 import { MessageSender } from '../../domain/entities/chat.entity';
 import { AgentRepository } from '../../../agents/domain/repositories/agent.repository.interface';
+import { LlmRepository } from '../../../agents/domain/repositories/llm.repository.interface';
 import { AiChatService } from '../../infra/external-api/ai-chat.service';
 import { SubscriptionRepository } from '../../../subscription/domain/repositories/subscription.repository.interface';
 export declare class SendMessageUseCase {
     private readonly chatRepository;
     private readonly agentRepository;
+    private readonly llmRepository;
     private readonly subscriptionRepository;
     private readonly aiChatService;
-    constructor(chatRepository: PrismaChatRepository, agentRepository: AgentRepository, subscriptionRepository: SubscriptionRepository, aiChatService: AiChatService);
+    constructor(chatRepository: PrismaChatRepository, agentRepository: AgentRepository, llmRepository: LlmRepository, subscriptionRepository: SubscriptionRepository, aiChatService: AiChatService);
     execute(chatId: string, content: string, sender: MessageSender, userId: string): Promise<{
         id: string;
         chat_id: string;

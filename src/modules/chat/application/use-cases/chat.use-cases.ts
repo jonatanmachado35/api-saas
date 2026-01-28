@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, Inject, ForbiddenException } from '@nest
 import { PrismaChatRepository } from '../../infra/repositories/prisma-chat.repository';
 import { Message, MessageSender } from '../../domain/entities/chat.entity';
 import { AgentRepository } from '../../../agents/domain/repositories/agent.repository.interface';
+import { LlmRepository } from '../../../agents/domain/repositories/llm.repository.interface';
 import { AiChatService } from '../../infra/external-api/ai-chat.service';
 import { SubscriptionRepository } from '../../../subscription/domain/repositories/subscription.repository.interface';
 
@@ -11,6 +12,8 @@ export class SendMessageUseCase {
     private readonly chatRepository: PrismaChatRepository,
     @Inject('AgentRepository')
     private readonly agentRepository: AgentRepository,
+    @Inject('LlmRepository')
+    private readonly llmRepository: LlmRepository,
     @Inject('SubscriptionRepository')
     private readonly subscriptionRepository: SubscriptionRepository,
     private readonly aiChatService: AiChatService,
@@ -24,20 +27,36 @@ export class SendMessageUseCase {
 
     // If sender is USER, verify and consume credits
     if (sender === MessageSender.USER) {
+      // Buscar dados do agent associado ao chat
+      const agent = await this.agentRepository.findById(chat.agentId);
+      if (!agent) {
+        throw new NotFoundException('Agent not found');
+      }
+
+      // Determinar custo de créditos baseado no LLM
+      let creditCost = 1; // Padrão se não tiver LLM configurado
+      
+      if (agent.llmId) {
+        const llm = await this.llmRepository.findById(agent.llmId);
+        if (llm) {
+          creditCost = llm.creditCost;
+        }
+      }
+
       // Verificar saldo de créditos
       const subscription = await this.subscriptionRepository.findByUserId(userId);
       if (!subscription) {
         throw new NotFoundException('Subscription not found');
       }
 
-      if (subscription.credits < 1) {
+      if (subscription.credits < creditCost) {
         throw new ForbiddenException(
-          'Créditos insuficientes. Você precisa de pelo menos 1 crédito para enviar uma mensagem.'
+          `Créditos insuficientes. Você precisa de pelo menos ${creditCost} crédito(s) para enviar uma mensagem com este agente.`
         );
       }
 
-      // Descontar 1 crédito ANTES de processar a mensagem
-      subscription.deductCredits(1);
+      // Descontar créditos ANTES de processar a mensagem
+      subscription.deductCredits(creditCost);
       await this.subscriptionRepository.save(subscription);
     }
 

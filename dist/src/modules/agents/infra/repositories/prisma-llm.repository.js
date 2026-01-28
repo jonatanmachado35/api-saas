@@ -26,6 +26,7 @@ let PrismaLlmRepository = class PrismaLlmRepository {
                 provider: llm.provider,
                 model: llm.model,
                 max_tokens: llm.maxTokens,
+                credit_cost: llm.creditCost,
                 active: llm.active,
             },
         });
@@ -52,6 +53,7 @@ let PrismaLlmRepository = class PrismaLlmRepository {
                 provider: llm.provider,
                 model: llm.model,
                 max_tokens: llm.maxTokens,
+                credit_cost: llm.creditCost,
                 active: llm.active,
                 updated_at: new Date(),
             },
@@ -69,6 +71,7 @@ let PrismaLlmRepository = class PrismaLlmRepository {
             provider: data.provider,
             model: data.model,
             maxTokens: data.max_tokens,
+            creditCost: data.credit_cost,
             active: data.active,
             createdAt: data.created_at,
             updatedAt: data.updated_at,

@@ -61,6 +61,7 @@ let CreateLlmUseCase = class CreateLlmUseCase {
             provider: input.provider,
             model: input.model,
             maxTokens: input.maxTokens,
+            creditCost: input.creditCost,
             active: true,
         });
         return this.llmRepository.create(llm);
@@ -87,6 +88,9 @@ let UpdateLlmUseCase = class UpdateLlmUseCase {
         }
         if (input.maxTokens !== undefined) {
             llm.updateMaxTokens(input.maxTokens);
+        }
+        if (input.creditCost !== undefined) {
+            llm.updateCreditCost(input.creditCost);
         }
         if (input.active !== undefined) {
             if (input.active) {

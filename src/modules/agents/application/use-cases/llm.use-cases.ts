@@ -48,6 +48,7 @@ export interface CreateLlmInput {
   provider: string;
   model: string;
   maxTokens: number;
+  creditCost: number;
 }
 
 @Injectable()
@@ -63,6 +64,7 @@ export class CreateLlmUseCase {
       provider: input.provider,
       model: input.model,
       maxTokens: input.maxTokens,
+      creditCost: input.creditCost,
       active: true,
     });
 
@@ -77,6 +79,7 @@ export interface UpdateLlmInput {
   provider?: string;
   model?: string;
   maxTokens?: number;
+  creditCost?: number;
   active?: boolean;
 }
 
@@ -100,6 +103,10 @@ export class UpdateLlmUseCase {
 
     if (input.maxTokens !== undefined) {
       llm.updateMaxTokens(input.maxTokens);
+    }
+
+    if (input.creditCost !== undefined) {
+      llm.updateCreditCost(input.creditCost);
     }
 
     if (input.active !== undefined) {

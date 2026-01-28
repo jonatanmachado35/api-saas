@@ -165,6 +165,7 @@ async function main() {
       provider: 'OpenAI',
       model: 'gpt-4-turbo-preview',
       max_tokens: 128000,
+      credit_cost: 3,
       active: true,
     },
   });
@@ -178,6 +179,7 @@ async function main() {
       provider: 'OpenAI',
       model: 'gpt-4',
       max_tokens: 8192,
+      credit_cost: 2,
       active: true,
     },
   });
@@ -191,6 +193,7 @@ async function main() {
       provider: 'OpenAI',
       model: 'gpt-3.5-turbo',
       max_tokens: 16385,
+      credit_cost: 1,
       active: true,
     },
   });
@@ -204,6 +207,7 @@ async function main() {
       provider: 'Anthropic',
       model: 'claude-3-opus-20240229',
       max_tokens: 200000,
+      credit_cost: 3,
       active: true,
     },
   });
@@ -217,6 +221,7 @@ async function main() {
       provider: 'Anthropic',
       model: 'claude-3-sonnet-20240229',
       max_tokens: 200000,
+      credit_cost: 2,
       active: true,
     },
   });
@@ -230,6 +235,7 @@ async function main() {
       provider: 'Google',
       model: 'gemini-pro',
       max_tokens: 32768,
+      credit_cost: 1,
       active: true,
     },
   });

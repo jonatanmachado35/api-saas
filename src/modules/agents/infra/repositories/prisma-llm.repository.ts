@@ -15,6 +15,7 @@ export class PrismaLlmRepository implements LlmRepository {
         provider: llm.provider,
         model: llm.model,
         max_tokens: llm.maxTokens,
+        credit_cost: llm.creditCost,
         active: llm.active,
       },
     });
@@ -47,6 +48,7 @@ export class PrismaLlmRepository implements LlmRepository {
         provider: llm.provider,
         model: llm.model,
         max_tokens: llm.maxTokens,
+        credit_cost: llm.creditCost,
         active: llm.active,
         updated_at: new Date(),
       },
@@ -68,6 +70,7 @@ export class PrismaLlmRepository implements LlmRepository {
         provider: data.provider,
         model: data.model,
         maxTokens: data.max_tokens,
+        creditCost: data.credit_cost,
         active: data.active,
         createdAt: data.created_at,
         updatedAt: data.updated_at,

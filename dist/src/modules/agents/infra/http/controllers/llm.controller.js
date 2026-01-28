@@ -27,6 +27,7 @@ class CreateLlmDto {
     provider;
     model;
     maxTokens;
+    creditCost;
 }
 exports.CreateLlmDto = CreateLlmDto;
 __decorate([
@@ -50,11 +51,18 @@ __decorate([
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateLlmDto.prototype, "maxTokens", void 0);
+__decorate([
+    (0, swagger_2.ApiProperty)({ example: 1, description: 'Custo em créditos por uso' }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], CreateLlmDto.prototype, "creditCost", void 0);
 class UpdateLlmDto {
     name;
     provider;
     model;
     maxTokens;
+    creditCost;
     active;
 }
 exports.UpdateLlmDto = UpdateLlmDto;
@@ -83,6 +91,13 @@ __decorate([
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], UpdateLlmDto.prototype, "maxTokens", void 0);
+__decorate([
+    (0, swagger_2.ApiPropertyOptional)({ example: 1, description: 'Custo em créditos por uso' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], UpdateLlmDto.prototype, "creditCost", void 0);
 __decorate([
     (0, swagger_2.ApiPropertyOptional)({ example: true, description: 'Se o LLM está ativo' }),
     (0, class_validator_1.IsOptional)(),

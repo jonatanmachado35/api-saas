@@ -21,6 +21,7 @@ export interface CreateLlmInput {
     provider: string;
     model: string;
     maxTokens: number;
+    creditCost: number;
 }
 export declare class CreateLlmUseCase {
     private readonly llmRepository;
@@ -33,6 +34,7 @@ export interface UpdateLlmInput {
     provider?: string;
     model?: string;
     maxTokens?: number;
+    creditCost?: number;
     active?: boolean;
 }
 export declare class UpdateLlmUseCase {

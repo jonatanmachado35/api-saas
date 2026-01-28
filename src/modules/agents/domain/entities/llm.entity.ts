@@ -5,6 +5,7 @@ export interface LlmProps {
   provider: string;
   model: string;
   maxTokens: number;
+  creditCost: number;
   active: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -29,6 +30,10 @@ export class Llm extends Entity<LlmProps> {
 
   get maxTokens() {
     return this.props.maxTokens;
+  }
+
+  get creditCost() {
+    return this.props.creditCost;
   }
 
   get active() {
@@ -58,6 +63,14 @@ export class Llm extends Entity<LlmProps> {
       throw new Error('Max tokens must be greater than 0');
     }
     this.props.maxTokens = maxTokens;
+    this.props.updatedAt = new Date();
+  }
+
+  updateCreditCost(creditCost: number): void {
+    if (creditCost <= 0) {
+      throw new Error('Credit cost must be greater than 0');
+    }
+    this.props.creditCost = creditCost;
     this.props.updatedAt = new Date();
   }
 

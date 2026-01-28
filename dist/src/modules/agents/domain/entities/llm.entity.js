@@ -18,6 +18,9 @@ class Llm extends base_classes_1.Entity {
     get maxTokens() {
         return this.props.maxTokens;
     }
+    get creditCost() {
+        return this.props.creditCost;
+    }
     get active() {
         return this.props.active;
     }
@@ -40,6 +43,13 @@ class Llm extends base_classes_1.Entity {
             throw new Error('Max tokens must be greater than 0');
         }
         this.props.maxTokens = maxTokens;
+        this.props.updatedAt = new Date();
+    }
+    updateCreditCost(creditCost) {
+        if (creditCost <= 0) {
+            throw new Error('Credit cost must be greater than 0');
+        }
+        this.props.creditCost = creditCost;
         this.props.updatedAt = new Date();
     }
     updateName(name) {

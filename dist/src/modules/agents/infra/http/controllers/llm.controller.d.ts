@@ -4,12 +4,14 @@ export declare class CreateLlmDto {
     provider: string;
     model: string;
     maxTokens: number;
+    creditCost: number;
 }
 export declare class UpdateLlmDto {
     name?: string;
     provider?: string;
     model?: string;
     maxTokens?: number;
+    creditCost?: number;
     active?: boolean;
 }
 export declare class LlmController {
