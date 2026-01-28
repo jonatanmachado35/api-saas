@@ -4,6 +4,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { SharedModule } from './modules/shared/shared.module';
 import { IamModule } from './modules/iam/iam.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { PaymentModule } from './modules/payment/payment.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -18,6 +19,7 @@ import { ContactModule } from './modules/contact/contact.module';
     SharedModule,
     IamModule,
     SubscriptionModule,
+    PaymentModule,
     AgentsModule,
     ChatModule,
     AdminModule,

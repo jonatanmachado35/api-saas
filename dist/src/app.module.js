@@ -13,6 +13,7 @@ const prisma_module_1 = require("./modules/prisma/prisma.module");
 const shared_module_1 = require("./modules/shared/shared.module");
 const iam_module_1 = require("./modules/iam/iam.module");
 const subscription_module_1 = require("./modules/subscription/subscription.module");
+const payment_module_1 = require("./modules/payment/payment.module");
 const agents_module_1 = require("./modules/agents/agents.module");
 const chat_module_1 = require("./modules/chat/chat.module");
 const admin_module_1 = require("./modules/admin/admin.module");
@@ -30,6 +31,7 @@ exports.AppModule = AppModule = __decorate([
             shared_module_1.SharedModule,
             iam_module_1.IamModule,
             subscription_module_1.SubscriptionModule,
+            payment_module_1.PaymentModule,
             agents_module_1.AgentsModule,
             chat_module_1.ChatModule,
             admin_module_1.AdminModule,
