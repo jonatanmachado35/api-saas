@@ -10,6 +10,7 @@ export enum AgentVisibility {
 
 export interface AgentProps {
   userId: string;
+  llmId?: string | null;
   name: string;
   avatar?: string | null;
   description?: string | null;
@@ -35,6 +36,9 @@ export class Agent extends Entity<AgentProps> {
 
   get userId() {
     return this.props.userId;
+  }
+  get llmId() {
+    return this.props.llmId;
   }
   get name() {
     return this.props.name;

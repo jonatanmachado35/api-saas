@@ -1,5 +1,6 @@
 import { AgentVisibility } from '../../../domain/entities/agent.entity';
 export declare class UpdateAgentDto {
+    llmId?: string;
     name?: string;
     avatar?: string;
     description?: string;

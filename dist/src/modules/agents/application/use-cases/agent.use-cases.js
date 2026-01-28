@@ -32,6 +32,7 @@ let CreateAgentUseCase = class CreateAgentUseCase {
         const visibility = isAdmin ? (input.visibility || agent_entity_1.AgentVisibility.PRIVATE) : agent_entity_1.AgentVisibility.PRIVATE;
         const agent = new agent_entity_1.Agent({
             userId: input.user_id,
+            llmId: input.llmId,
             name: input.name,
             avatar: input.avatar,
             description: input.description,
@@ -85,6 +86,7 @@ let UpdateAgentUseCase = class UpdateAgentUseCase {
         }
         const updatedAgent = new agent_entity_1.Agent({
             ...agent.props,
+            llmId: input.llmId ?? agent.llmId,
             name: input.name ?? agent.name,
             avatar: input.avatar ?? agent.avatar,
             description: input.description ?? agent.description,

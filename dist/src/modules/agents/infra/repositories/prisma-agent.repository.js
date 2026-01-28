@@ -21,6 +21,7 @@ let PrismaAgentRepository = class PrismaAgentRepository {
     toDomain(agent) {
         return new agent_entity_1.Agent({
             userId: agent.user_id,
+            llmId: agent.llm_id,
             name: agent.name,
             avatar: agent.avatar,
             description: agent.description,
@@ -40,6 +41,7 @@ let PrismaAgentRepository = class PrismaAgentRepository {
         const data = {
             id: agent.id,
             user_id: agent.userId,
+            llm_id: agent.llmId,
             name: agent.name,
             avatar: agent.avatar,
             description: agent.description,
@@ -55,6 +57,7 @@ let PrismaAgentRepository = class PrismaAgentRepository {
         await this.prisma.agent.upsert({
             where: { id: agent.id },
             update: {
+                llm_id: data.llm_id,
                 name: data.name,
                 avatar: data.avatar,
                 description: data.description,

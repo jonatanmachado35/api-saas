@@ -8,10 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const httpAdapterHost = app.get(HttpAdapterHost);
 
-  // Global prefix
-  app.setGlobalPrefix('api');
-
-  // CORS
+  // CORS - BEFORE global prefix so root healthcheck works
   const allowedOrigins = process.env.CORS_ORIGIN 
     ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
     : '*';
@@ -20,6 +17,11 @@ async function bootstrap() {
     origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+  });
+
+  // Global prefix (applied after controllers are loaded)
+  app.setGlobalPrefix('api', {
+    exclude: ['/'], // Exclude root path for health check
   });
 
   // Validation
@@ -49,7 +51,13 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
-  console.log(`Application is running on: http://localhost:${port}/api`);
-  console.log(`Swagger docs available at: http://localhost:${port}/api/docs`);
+  
+  console.log(`========================================`);
+  console.log(`🚀 Application is running!`);
+  console.log(`📍 URL: http://0.0.0.0:${port}`);
+  console.log(`📍 Health: http://0.0.0.0:${port}/`);
+  console.log(`📍 API: http://0.0.0.0:${port}/api`);
+  console.log(`📚 Swagger: http://0.0.0.0:${port}/api/docs`);
+  console.log(`========================================`);
 }
 bootstrap();

@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 const agent_entity_1 = require("../../../domain/entities/agent.entity");
 class UpdateAgentDto {
+    llmId;
     name;
     avatar;
     description;
@@ -27,6 +28,12 @@ class UpdateAgentDto {
     visibility;
 }
 exports.UpdateAgentDto = UpdateAgentDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'uuid-do-llm', description: 'ID do LLM a ser usado pelo agente' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], UpdateAgentDto.prototype, "llmId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Novo Nome', description: 'Nome do agente' }),
     (0, class_validator_1.IsOptional)(),

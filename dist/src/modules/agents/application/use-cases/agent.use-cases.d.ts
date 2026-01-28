@@ -4,6 +4,7 @@ export interface CreateAgentInput {
     user_id: string;
     user_role?: string;
     user_plan?: string;
+    llmId?: string;
     name: string;
     avatar?: string;
     description?: string;
@@ -38,6 +39,7 @@ export declare class CreateAgentUseCase {
 }
 export interface UpdateAgentInput {
     user_role?: string;
+    llmId?: string;
     name?: string;
     avatar?: string;
     description?: string;

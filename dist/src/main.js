@@ -8,7 +8,6 @@ const all_exceptions_filter_1 = require("./core/filters/all-exceptions.filter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const httpAdapterHost = app.get(core_1.HttpAdapterHost);
-    app.setGlobalPrefix('api');
     const allowedOrigins = process.env.CORS_ORIGIN
         ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
         : '*';
@@ -16,6 +15,9 @@ async function bootstrap() {
         origin: allowedOrigins,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
+    });
+    app.setGlobalPrefix('api', {
+        exclude: ['/'],
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
@@ -36,8 +38,13 @@ async function bootstrap() {
     swagger_1.SwaggerModule.setup('api/docs', app, document);
     const port = process.env.PORT || 3000;
     await app.listen(port, '0.0.0.0');
-    console.log(`Application is running on: http://localhost:${port}/api`);
-    console.log(`Swagger docs available at: http://localhost:${port}/api/docs`);
+    console.log(`========================================`);
+    console.log(`🚀 Application is running!`);
+    console.log(`📍 URL: http://0.0.0.0:${port}`);
+    console.log(`📍 Health: http://0.0.0.0:${port}/`);
+    console.log(`📍 API: http://0.0.0.0:${port}/api`);
+    console.log(`📚 Swagger: http://0.0.0.0:${port}/api/docs`);
+    console.log(`========================================`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

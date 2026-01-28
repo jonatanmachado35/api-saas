@@ -1,8 +1,13 @@
-import { IsString, IsOptional, MaxLength, IsEnum } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsEnum, IsUUID } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { AgentVisibility } from '../../../domain/entities/agent.entity';
 
 export class UpdateAgentDto {
+  @ApiPropertyOptional({ example: 'uuid-do-llm', description: 'ID do LLM a ser usado pelo agente' })
+  @IsOptional()
+  @IsUUID()
+  llmId?: string;
+
   @ApiPropertyOptional({ example: 'Novo Nome', description: 'Nome do agente' })
   @IsOptional()
   @IsString()

@@ -6,6 +6,7 @@ export interface CreateAgentInput {
   user_id: string;
   user_role?: string;
   user_plan?: string;
+  llmId?: string;
   name: string;
   avatar?: string;
   description?: string;
@@ -45,6 +46,7 @@ export class CreateAgentUseCase {
 
     const agent = new Agent({
       userId: input.user_id,
+      llmId: input.llmId,
       name: input.name,
       avatar: input.avatar,
       description: input.description,
@@ -81,6 +83,7 @@ export class CreateAgentUseCase {
 
 export interface UpdateAgentInput {
   user_role?: string;
+  llmId?: string;
   name?: string;
   avatar?: string;
   description?: string;
@@ -117,6 +120,7 @@ export class UpdateAgentUseCase {
     const updatedAgent = new Agent(
       {
         ...agent.props,
+        llmId: input.llmId ?? agent.llmId,
         name: input.name ?? agent.name,
         avatar: input.avatar ?? agent.avatar,
         description: input.description ?? agent.description,

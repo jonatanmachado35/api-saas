@@ -11,6 +11,7 @@ export class PrismaAgentRepository implements AgentRepository {
     return new Agent(
       {
         userId: agent.user_id,
+        llmId: agent.llm_id,
         name: agent.name,
         avatar: agent.avatar,
         description: agent.description,
@@ -33,6 +34,7 @@ export class PrismaAgentRepository implements AgentRepository {
     const data = {
       id: agent.id,
       user_id: agent.userId,
+      llm_id: agent.llmId,
       name: agent.name,
       avatar: agent.avatar,
       description: agent.description,
@@ -49,6 +51,7 @@ export class PrismaAgentRepository implements AgentRepository {
     await this.prisma.agent.upsert({
       where: { id: agent.id },
       update: {
+        llm_id: data.llm_id,
         name: data.name,
         avatar: data.avatar,
         description: data.description,

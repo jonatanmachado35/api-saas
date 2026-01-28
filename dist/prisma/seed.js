@@ -165,6 +165,80 @@ async function main() {
         },
     });
     console.log('✅ Products seeded');
+    console.log('🌱 Seeding LLMs...');
+    await prisma.llm.upsert({
+        where: { id: '00000000-0000-0000-0000-llm000000001' },
+        update: {},
+        create: {
+            id: '00000000-0000-0000-0000-llm000000001',
+            name: 'GPT-4 Turbo',
+            provider: 'OpenAI',
+            model: 'gpt-4-turbo-preview',
+            max_tokens: 128000,
+            active: true,
+        },
+    });
+    await prisma.llm.upsert({
+        where: { id: '00000000-0000-0000-0000-llm000000002' },
+        update: {},
+        create: {
+            id: '00000000-0000-0000-0000-llm000000002',
+            name: 'GPT-4',
+            provider: 'OpenAI',
+            model: 'gpt-4',
+            max_tokens: 8192,
+            active: true,
+        },
+    });
+    await prisma.llm.upsert({
+        where: { id: '00000000-0000-0000-0000-llm000000003' },
+        update: {},
+        create: {
+            id: '00000000-0000-0000-0000-llm000000003',
+            name: 'GPT-3.5 Turbo',
+            provider: 'OpenAI',
+            model: 'gpt-3.5-turbo',
+            max_tokens: 16385,
+            active: true,
+        },
+    });
+    await prisma.llm.upsert({
+        where: { id: '00000000-0000-0000-0000-llm000000004' },
+        update: {},
+        create: {
+            id: '00000000-0000-0000-0000-llm000000004',
+            name: 'Claude 3 Opus',
+            provider: 'Anthropic',
+            model: 'claude-3-opus-20240229',
+            max_tokens: 200000,
+            active: true,
+        },
+    });
+    await prisma.llm.upsert({
+        where: { id: '00000000-0000-0000-0000-llm000000005' },
+        update: {},
+        create: {
+            id: '00000000-0000-0000-0000-llm000000005',
+            name: 'Claude 3 Sonnet',
+            provider: 'Anthropic',
+            model: 'claude-3-sonnet-20240229',
+            max_tokens: 200000,
+            active: true,
+        },
+    });
+    await prisma.llm.upsert({
+        where: { id: '00000000-0000-0000-0000-llm000000006' },
+        update: {},
+        create: {
+            id: '00000000-0000-0000-0000-llm000000006',
+            name: 'Gemini Pro',
+            provider: 'Google',
+            model: 'gemini-pro',
+            max_tokens: 32768,
+            active: true,
+        },
+    });
+    console.log('✅ LLMs seeded');
     const agent1 = await prisma.agent.upsert({
         where: { id: '00000000-0000-0000-0000-000000000001' },
         update: {},

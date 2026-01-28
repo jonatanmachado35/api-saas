@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MaxLength, IsEnum } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsEnum, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AgentVisibility } from '../../../domain/entities/agent.entity';
 
@@ -6,6 +6,11 @@ export class CreateAgentDto {
   // Campo ignorado - user_id vem do token JWT
   @IsOptional()
   user_id?: string;
+
+  @ApiPropertyOptional({ example: 'uuid-do-llm', description: 'ID do LLM a ser usado pelo agente' })
+  @IsOptional()
+  @IsUUID()
+  llmId?: string;
 
   @ApiProperty({ example: 'Meu Agente', description: 'Nome do agente' })
   @IsString()

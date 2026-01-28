@@ -20,6 +20,9 @@ class Agent extends base_classes_1.Entity {
     get userId() {
         return this.props.userId;
     }
+    get llmId() {
+        return this.props.llmId;
+    }
     get name() {
         return this.props.name;
     }
