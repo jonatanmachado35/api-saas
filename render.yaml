@@ -49,10 +49,3 @@ services:
         value: https://api.abacatepay.com/v1
       - key: CORS_ORIGIN
         sync: false
-
-databases:
-  - name: agentchat-db
-    databaseName: agentchat
-    user: agentchat
-    plan: free
-    region: oregon
