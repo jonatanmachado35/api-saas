@@ -15,39 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListPaymentsUseCase = exports.GetPaymentUseCase = exports.CreateCreditsPaymentUseCase = exports.CreateSubscriptionPaymentUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const payment_entity_1 = require("../../domain/entities/payment.entity");
+const product_entity_1 = require("../../domain/entities/product.entity");
 const abacatepay_service_1 = require("../../infra/services/abacatepay.service");
-const PLAN_PRICES = {
-    pro: 4990,
-};
-const CREDIT_PACKAGES_PRICES = {
-    starter: { price: 990, credits: 100, bonus: 0 },
-    popular: { price: 3990, credits: 500, bonus: 50 },
-    pro: { price: 6990, credits: 1000, bonus: 150 },
-    enterprise: { price: 29990, credits: 5000, bonus: 1000 },
-};
 let CreateSubscriptionPaymentUseCase = class CreateSubscriptionPaymentUseCase {
     paymentRepository;
+    productRepository;
     abacatePayService;
-    constructor(paymentRepository, abacatePayService) {
+    constructor(paymentRepository, productRepository, abacatePayService) {
         this.paymentRepository = paymentRepository;
+        this.productRepository = productRepository;
         this.abacatePayService = abacatePayService;
     }
     async execute(input) {
-        const planLower = input.plan.toLowerCase();
-        if (!PLAN_PRICES[planLower]) {
+        const product = await this.productRepository.findBySlug(input.plan);
+        if (!product || !product.active || product.type !== product_entity_1.ProductType.SUBSCRIPTION) {
             throw new common_1.BadRequestException('Invalid plan');
         }
-        const price = PLAN_PRICES[planLower];
+        if (!product || !product.active || product.type !== product_entity_1.ProductType.SUBSCRIPTION) {
+            throw new common_1.BadRequestException('Invalid plan');
+        }
         const payment = new payment_entity_1.Payment({
             userId: input.userId,
             type: payment_entity_1.PaymentType.SUBSCRIPTION,
-            amount: price,
-            description: `Assinatura ${input.plan.toUpperCase()} - Mensal`,
+            amount: product.price,
+            description: `Assinatura ${product.name} - Mensal`,
             status: payment_entity_1.PaymentStatus.PENDING,
             frequency: payment_entity_1.PaymentFrequency.MONTHLY,
             metadata: {
                 plan: input.plan,
                 email: input.email,
+                productId: product.id,
             },
         });
         await this.paymentRepository.save(payment);
@@ -57,10 +54,10 @@ let CreateSubscriptionPaymentUseCase = class CreateSubscriptionPaymentUseCase {
             products: [
                 {
                     externalId: payment.id,
-                    name: `Plano ${input.plan.toUpperCase()}`,
+                    name: product.name,
                     description: 'Assinatura mensal AgentChat',
                     quantity: 1,
-                    price,
+                    price: product.price,
                 },
             ],
             returnUrl: input.returnUrl,
@@ -83,7 +80,7 @@ let CreateSubscriptionPaymentUseCase = class CreateSubscriptionPaymentUseCase {
             paymentId: payment.id,
             externalId: billingResponse.data.id,
             paymentUrl: billingResponse.data.url,
-            amount: price,
+            amount: product.price,
             status: 'pending',
         };
     }
@@ -92,34 +89,38 @@ exports.CreateSubscriptionPaymentUseCase = CreateSubscriptionPaymentUseCase;
 exports.CreateSubscriptionPaymentUseCase = CreateSubscriptionPaymentUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('PaymentRepository')),
-    __metadata("design:paramtypes", [Object, abacatepay_service_1.AbacatePayService])
+    __param(1, (0, common_1.Inject)('ProductRepository')),
+    __metadata("design:paramtypes", [Object, Object, abacatepay_service_1.AbacatePayService])
 ], CreateSubscriptionPaymentUseCase);
 let CreateCreditsPaymentUseCase = class CreateCreditsPaymentUseCase {
     paymentRepository;
+    productRepository;
     abacatePayService;
-    constructor(paymentRepository, abacatePayService) {
+    constructor(paymentRepository, productRepository, abacatePayService) {
         this.paymentRepository = paymentRepository;
+        this.productRepository = productRepository;
         this.abacatePayService = abacatePayService;
     }
     async execute(input) {
-        const packageData = CREDIT_PACKAGES_PRICES[input.packageId];
-        if (!packageData) {
+        const product = await this.productRepository.findBySlug(input.packageId);
+        if (!product || !product.active || product.type !== product_entity_1.ProductType.CREDITS) {
             throw new common_1.BadRequestException('Invalid package');
         }
-        const totalCredits = packageData.credits + packageData.bonus;
+        const totalCredits = (product.credits || 0) + (product.bonus || 0);
         const payment = new payment_entity_1.Payment({
             userId: input.userId,
             type: payment_entity_1.PaymentType.CREDITS,
-            amount: packageData.price,
-            description: `Compra de ${totalCredits} créditos (pacote ${input.packageId})`,
+            amount: product.price,
+            description: `Compra de ${totalCredits} créditos (${product.name})`,
             status: payment_entity_1.PaymentStatus.PENDING,
             frequency: payment_entity_1.PaymentFrequency.ONE_TIME,
             metadata: {
                 packageId: input.packageId,
-                credits: packageData.credits,
-                bonus: packageData.bonus,
+                credits: product.credits || 0,
+                bonus: product.bonus || 0,
                 totalCredits,
                 email: input.email,
+                productId: product.id,
             },
         });
         await this.paymentRepository.save(payment);
@@ -129,10 +130,10 @@ let CreateCreditsPaymentUseCase = class CreateCreditsPaymentUseCase {
             products: [
                 {
                     externalId: payment.id,
-                    name: `Pacote ${input.packageId.toUpperCase()}`,
-                    description: `${totalCredits} créditos (${packageData.credits} + ${packageData.bonus} bônus)`,
+                    name: product.name,
+                    description: `${totalCredits} créditos (${product.credits} + ${product.bonus || 0} bônus)`,
                     quantity: 1,
-                    price: packageData.price,
+                    price: product.price,
                 },
             ],
             returnUrl: input.returnUrl,
@@ -143,8 +144,8 @@ let CreateCreditsPaymentUseCase = class CreateCreditsPaymentUseCase {
                 email: input.email,
                 type: 'credits',
                 packageId: input.packageId,
-                credits: packageData.credits,
-                bonus: packageData.bonus,
+                credits: product.credits || 0,
+                bonus: product.bonus || 0,
             },
         });
         if (billingResponse.error) {
@@ -157,7 +158,7 @@ let CreateCreditsPaymentUseCase = class CreateCreditsPaymentUseCase {
             paymentId: payment.id,
             externalId: billingResponse.data.id,
             paymentUrl: billingResponse.data.url,
-            amount: packageData.price,
+            amount: product.price,
             credits: totalCredits,
             status: 'pending',
         };
@@ -167,7 +168,8 @@ exports.CreateCreditsPaymentUseCase = CreateCreditsPaymentUseCase;
 exports.CreateCreditsPaymentUseCase = CreateCreditsPaymentUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('PaymentRepository')),
-    __metadata("design:paramtypes", [Object, abacatepay_service_1.AbacatePayService])
+    __param(1, (0, common_1.Inject)('ProductRepository')),
+    __metadata("design:paramtypes", [Object, Object, abacatepay_service_1.AbacatePayService])
 ], CreateCreditsPaymentUseCase);
 let GetPaymentUseCase = class GetPaymentUseCase {
     paymentRepository;

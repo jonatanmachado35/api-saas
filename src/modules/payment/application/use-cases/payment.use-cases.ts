@@ -1,20 +1,9 @@
 import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PaymentRepository } from '../../domain/repositories/payment.repository.interface';
+import { ProductRepository } from '../../domain/repositories/product.repository.interface';
 import { Payment, PaymentType, PaymentStatus, PaymentFrequency } from '../../domain/entities/payment.entity';
+import { ProductType } from '../../domain/entities/product.entity';
 import { AbacatePayService } from '../../infra/services/abacatepay.service';
-
-// Preços dos planos em centavos (R$)
-const PLAN_PRICES: Record<string, number> = {
-  pro: 4990, // R$ 49,90
-};
-
-// Preços dos pacotes de créditos em centavos (R$)
-const CREDIT_PACKAGES_PRICES: Record<string, { price: number; credits: number; bonus: number }> = {
-  starter: { price: 990, credits: 100, bonus: 0 },
-  popular: { price: 3990, credits: 500, bonus: 50 },
-  pro: { price: 6990, credits: 1000, bonus: 150 },
-  enterprise: { price: 29990, credits: 5000, bonus: 1000 },
-};
 
 export interface CreateSubscriptionPaymentInput {
   userId: string;
@@ -28,29 +17,35 @@ export class CreateSubscriptionPaymentUseCase {
   constructor(
     @Inject('PaymentRepository')
     private readonly paymentRepository: PaymentRepository,
+    @Inject('ProductRepository')
+    private readonly productRepository: ProductRepository,
     private readonly abacatePayService: AbacatePayService,
   ) {}
 
   async execute(input: CreateSubscriptionPaymentInput) {
-    const planLower = input.plan.toLowerCase();
+    // Buscar produto do banco
+    const product = await this.productRepository.findBySlug(input.plan);
     
-    if (!PLAN_PRICES[planLower]) {
+    if (!product || !product.active || product.type !== ProductType.SUBSCRIPTION) {
       throw new BadRequestException('Invalid plan');
     }
 
-    const price = PLAN_PRICES[planLower];
+    if (!product || !product.active || product.type !== ProductType.SUBSCRIPTION) {
+      throw new BadRequestException('Invalid plan');
+    }
 
     // Criar payment local
     const payment = new Payment({
       userId: input.userId,
       type: PaymentType.SUBSCRIPTION,
-      amount: price,
-      description: `Assinatura ${input.plan.toUpperCase()} - Mensal`,
+      amount: product.price,
+      description: `Assinatura ${product.name} - Mensal`,
       status: PaymentStatus.PENDING,
       frequency: PaymentFrequency.MONTHLY,
       metadata: {
         plan: input.plan,
         email: input.email,
+        productId: product.id,
       },
     });
 
@@ -63,10 +58,10 @@ export class CreateSubscriptionPaymentUseCase {
       products: [
         {
           externalId: payment.id,
-          name: `Plano ${input.plan.toUpperCase()}`,
+          name: product.name,
           description: 'Assinatura mensal AgentChat',
           quantity: 1,
-          price,
+          price: product.price,
         },
       ],
       returnUrl: input.returnUrl,
@@ -93,7 +88,7 @@ export class CreateSubscriptionPaymentUseCase {
       paymentId: payment.id,
       externalId: billingResponse.data.id,
       paymentUrl: billingResponse.data.url,
-      amount: price,
+      amount: product.price,
       status: 'pending',
     };
   }
@@ -111,32 +106,36 @@ export class CreateCreditsPaymentUseCase {
   constructor(
     @Inject('PaymentRepository')
     private readonly paymentRepository: PaymentRepository,
+    @Inject('ProductRepository')
+    private readonly productRepository: ProductRepository,
     private readonly abacatePayService: AbacatePayService,
   ) {}
 
   async execute(input: CreateCreditsPaymentInput) {
-    const packageData = CREDIT_PACKAGES_PRICES[input.packageId];
+    // Buscar produto do banco
+    const product = await this.productRepository.findBySlug(input.packageId);
     
-    if (!packageData) {
+    if (!product || !product.active || product.type !== ProductType.CREDITS) {
       throw new BadRequestException('Invalid package');
     }
 
-    const totalCredits = packageData.credits + packageData.bonus;
+    const totalCredits = (product.credits || 0) + (product.bonus || 0);
 
     // Criar payment local
     const payment = new Payment({
       userId: input.userId,
       type: PaymentType.CREDITS,
-      amount: packageData.price,
-      description: `Compra de ${totalCredits} créditos (pacote ${input.packageId})`,
+      amount: product.price,
+      description: `Compra de ${totalCredits} créditos (${product.name})`,
       status: PaymentStatus.PENDING,
       frequency: PaymentFrequency.ONE_TIME,
       metadata: {
         packageId: input.packageId,
-        credits: packageData.credits,
-        bonus: packageData.bonus,
+        credits: product.credits || 0,
+        bonus: product.bonus || 0,
         totalCredits,
         email: input.email,
+        productId: product.id,
       },
     });
 
@@ -149,10 +148,10 @@ export class CreateCreditsPaymentUseCase {
       products: [
         {
           externalId: payment.id,
-          name: `Pacote ${input.packageId.toUpperCase()}`,
-          description: `${totalCredits} créditos (${packageData.credits} + ${packageData.bonus} bônus)`,
+          name: product.name,
+          description: `${totalCredits} créditos (${product.credits} + ${product.bonus || 0} bônus)`,
           quantity: 1,
-          price: packageData.price,
+          price: product.price,
         },
       ],
       returnUrl: input.returnUrl,
@@ -163,8 +162,8 @@ export class CreateCreditsPaymentUseCase {
         email: input.email,
         type: 'credits',
         packageId: input.packageId,
-        credits: packageData.credits,
-        bonus: packageData.bonus,
+        credits: product.credits || 0,
+        bonus: product.bonus || 0,
       },
     });
 
@@ -181,7 +180,7 @@ export class CreateCreditsPaymentUseCase {
       paymentId: payment.id,
       externalId: billingResponse.data.id,
       paymentUrl: billingResponse.data.url,
-      amount: packageData.price,
+      amount: product.price,
       credits: totalCredits,
       status: 'pending',
     };

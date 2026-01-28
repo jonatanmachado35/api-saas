@@ -155,6 +155,11 @@ enum PaymentFrequency {
   MONTHLY
 }
 
+enum ProductType {
+  SUBSCRIPTION
+  CREDITS
+}
+
 model Payment {
   id          String           @id @default(uuid())
   user_id     String
@@ -172,4 +177,20 @@ model Payment {
   user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("payments")
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  type        ProductType
+  slug        String      @unique
+  name        String
+  description String?
+  price       Int
+  credits     Int?
+  bonus       Int?
+  active      Boolean     @default(true)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+
+  @@map("products")
 }

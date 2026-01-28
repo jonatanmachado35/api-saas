@@ -10,10 +10,13 @@ exports.PaymentModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const prisma_payment_repository_1 = require("./infra/repositories/prisma-payment.repository");
+const prisma_product_repository_1 = require("./infra/repositories/prisma-product.repository");
 const abacatepay_service_1 = require("./infra/services/abacatepay.service");
 const payment_controller_1 = require("./infra/http/controllers/payment.controller");
+const product_controller_1 = require("./infra/http/controllers/product.controller");
 const payment_use_cases_1 = require("./application/use-cases/payment.use-cases");
 const webhook_use_case_1 = require("./application/use-cases/webhook.use-case");
+const product_use_cases_1 = require("./application/use-cases/product.use-cases");
 const iam_module_1 = require("../iam/iam.module");
 const subscription_module_1 = require("../subscription/subscription.module");
 let PaymentModule = class PaymentModule {
@@ -22,11 +25,15 @@ exports.PaymentModule = PaymentModule;
 exports.PaymentModule = PaymentModule = __decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule, iam_module_1.IamModule, subscription_module_1.SubscriptionModule],
-        controllers: [payment_controller_1.PaymentController, payment_controller_1.WebhookController],
+        controllers: [payment_controller_1.PaymentController, payment_controller_1.WebhookController, product_controller_1.ProductController, product_controller_1.AdminProductController],
         providers: [
             {
                 provide: 'PaymentRepository',
                 useClass: prisma_payment_repository_1.PrismaPaymentRepository,
+            },
+            {
+                provide: 'ProductRepository',
+                useClass: prisma_product_repository_1.PrismaProductRepository,
             },
             abacatepay_service_1.AbacatePayService,
             payment_use_cases_1.CreateSubscriptionPaymentUseCase,
@@ -34,8 +41,13 @@ exports.PaymentModule = PaymentModule = __decorate([
             payment_use_cases_1.GetPaymentUseCase,
             payment_use_cases_1.ListPaymentsUseCase,
             webhook_use_case_1.ProcessPaymentWebhookUseCase,
+            product_use_cases_1.ListProductsUseCase,
+            product_use_cases_1.GetProductBySlugUseCase,
+            product_use_cases_1.CreateProductUseCase,
+            product_use_cases_1.UpdateProductUseCase,
+            product_use_cases_1.DeleteProductUseCase,
         ],
-        exports: ['PaymentRepository', webhook_use_case_1.ProcessPaymentWebhookUseCase],
+        exports: ['PaymentRepository', 'ProductRepository', webhook_use_case_1.ProcessPaymentWebhookUseCase],
     })
 ], PaymentModule);
 //# sourceMappingURL=payment.module.js.map

@@ -1,4 +1,5 @@
 import { PaymentRepository } from '../../domain/repositories/payment.repository.interface';
+import { ProductRepository } from '../../domain/repositories/product.repository.interface';
 import { AbacatePayService } from '../../infra/services/abacatepay.service';
 export interface CreateSubscriptionPaymentInput {
     userId: string;
@@ -8,8 +9,9 @@ export interface CreateSubscriptionPaymentInput {
 }
 export declare class CreateSubscriptionPaymentUseCase {
     private readonly paymentRepository;
+    private readonly productRepository;
     private readonly abacatePayService;
-    constructor(paymentRepository: PaymentRepository, abacatePayService: AbacatePayService);
+    constructor(paymentRepository: PaymentRepository, productRepository: ProductRepository, abacatePayService: AbacatePayService);
     execute(input: CreateSubscriptionPaymentInput): Promise<{
         paymentId: string;
         externalId: string;
@@ -26,8 +28,9 @@ export interface CreateCreditsPaymentInput {
 }
 export declare class CreateCreditsPaymentUseCase {
     private readonly paymentRepository;
+    private readonly productRepository;
     private readonly abacatePayService;
-    constructor(paymentRepository: PaymentRepository, abacatePayService: AbacatePayService);
+    constructor(paymentRepository: PaymentRepository, productRepository: ProductRepository, abacatePayService: AbacatePayService);
     execute(input: CreateCreditsPaymentInput): Promise<{
         paymentId: string;
         externalId: string;

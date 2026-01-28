@@ -70,6 +70,89 @@ async function main() {
   });
   console.log('✅ Free user created:', freeUser.email);
 
+  // Seed Products
+  console.log('🌱 Seeding products...');
+
+  // Plano PRO (Assinatura)
+  await prisma.product.upsert({
+    where: { slug: 'pro' },
+    update: {},
+    create: {
+      type: 'SUBSCRIPTION',
+      slug: 'pro',
+      name: 'Plano PRO',
+      description: 'Assinatura mensal com 500 créditos',
+      price: 4990, // R$ 49,90
+      active: true,
+    },
+  });
+
+  // Pacote Starter
+  await prisma.product.upsert({
+    where: { slug: 'starter' },
+    update: {},
+    create: {
+      type: 'CREDITS',
+      slug: 'starter',
+      name: 'Pacote Starter',
+      description: '100 créditos para começar',
+      price: 990, // R$ 9,90
+      credits: 100,
+      bonus: 0,
+      active: true,
+    },
+  });
+
+  // Pacote Popular
+  await prisma.product.upsert({
+    where: { slug: 'popular' },
+    update: {},
+    create: {
+      type: 'CREDITS',
+      slug: 'popular',
+      name: 'Pacote Popular',
+      description: '500 créditos + 50 de bônus',
+      price: 3990, // R$ 39,90
+      credits: 500,
+      bonus: 50,
+      active: true,
+    },
+  });
+
+  // Pacote Pro
+  await prisma.product.upsert({
+    where: { slug: 'pro-credits' },
+    update: {},
+    create: {
+      type: 'CREDITS',
+      slug: 'pro-credits',
+      name: 'Pacote Pro',
+      description: '1000 créditos + 150 de bônus',
+      price: 6990, // R$ 69,90
+      credits: 1000,
+      bonus: 150,
+      active: true,
+    },
+  });
+
+  // Pacote Enterprise
+  await prisma.product.upsert({
+    where: { slug: 'enterprise' },
+    update: {},
+    create: {
+      type: 'CREDITS',
+      slug: 'enterprise',
+      name: 'Pacote Enterprise',
+      description: '5000 créditos + 1000 de bônus',
+      price: 29990, // R$ 299,90
+      credits: 5000,
+      bonus: 1000,
+      active: true,
+    },
+  });
+
+  console.log('✅ Products seeded');
+
   // Create demo agents for demo user
   const agent1 = await prisma.agent.upsert({
     where: { id: '00000000-0000-0000-0000-000000000001' },

@@ -95,6 +95,76 @@ async function main() {
         },
     });
     console.log('✅ Free user created:', freeUser.email);
+    console.log('🌱 Seeding products...');
+    await prisma.product.upsert({
+        where: { slug: 'pro' },
+        update: {},
+        create: {
+            type: 'SUBSCRIPTION',
+            slug: 'pro',
+            name: 'Plano PRO',
+            description: 'Assinatura mensal com 500 créditos',
+            price: 4990,
+            active: true,
+        },
+    });
+    await prisma.product.upsert({
+        where: { slug: 'starter' },
+        update: {},
+        create: {
+            type: 'CREDITS',
+            slug: 'starter',
+            name: 'Pacote Starter',
+            description: '100 créditos para começar',
+            price: 990,
+            credits: 100,
+            bonus: 0,
+            active: true,
+        },
+    });
+    await prisma.product.upsert({
+        where: { slug: 'popular' },
+        update: {},
+        create: {
+            type: 'CREDITS',
+            slug: 'popular',
+            name: 'Pacote Popular',
+            description: '500 créditos + 50 de bônus',
+            price: 3990,
+            credits: 500,
+            bonus: 50,
+            active: true,
+        },
+    });
+    await prisma.product.upsert({
+        where: { slug: 'pro-credits' },
+        update: {},
+        create: {
+            type: 'CREDITS',
+            slug: 'pro-credits',
+            name: 'Pacote Pro',
+            description: '1000 créditos + 150 de bônus',
+            price: 6990,
+            credits: 1000,
+            bonus: 150,
+            active: true,
+        },
+    });
+    await prisma.product.upsert({
+        where: { slug: 'enterprise' },
+        update: {},
+        create: {
+            type: 'CREDITS',
+            slug: 'enterprise',
+            name: 'Pacote Enterprise',
+            description: '5000 créditos + 1000 de bônus',
+            price: 29990,
+            credits: 5000,
+            bonus: 1000,
+            active: true,
+        },
+    });
+    console.log('✅ Products seeded');
     const agent1 = await prisma.agent.upsert({
         where: { id: '00000000-0000-0000-0000-000000000001' },
         update: {},
